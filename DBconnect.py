@@ -10,7 +10,7 @@ class DBconnect:
               host="localhost",
               user="root",
               passwd="root",
-              database="Tweets"
+              database="littlebirds"
         )
 
         mycursor = db.cursor()
@@ -18,8 +18,7 @@ class DBconnect:
         result = mycursor.fetchall()
 
         for x in result:
-          print(x[6])
+          print(x[0])
 
         db.close()
-
         return result
