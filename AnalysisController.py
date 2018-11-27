@@ -3,7 +3,6 @@ import DBconnect
 import Tweet
 import Word
 
-
 class AnalysisController:
 
     analyzed_words_counter = 0
