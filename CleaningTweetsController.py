@@ -25,3 +25,15 @@ def SetEpisodeID(tweet):
 
         elif tweet.date < CleaningTweetsController.episodes[i]:
             tweet.episodeID = CleaningTweetsController.episodes[i-1]
+
+def CleanTweet(tweet):
+
+    #SPLIT THE TEXT TO WORDS AND
+    #CONVERT EVERY WORD TO LOWERCASE
+
+    tweet.text.split(" ")
+    for word in tweet.text:
+        word = word.lower()
+
+    foriegnWordsCnt = 0
+    for word in tweet.text:
