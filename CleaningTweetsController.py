@@ -11,7 +11,7 @@ class CleaningTweetsController:
         episode.date = datetime.datetime(date[2], date[1], date[0])
 
 
-def Clean_Tweet(tweet):
+def SetEpisodeID(tweet):
 
     date = tweet.date.split("/")
     tweet.date = datetime.datetime(date[2], date[1], date[0])
@@ -26,4 +26,3 @@ def Clean_Tweet(tweet):
         elif tweet.date > CleaningTweetsController.episodes[7]:
             tweet.episodeID = CleaningTweetsController.episodes[7]
 
-    
