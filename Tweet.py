@@ -1,3 +1,4 @@
+import Episode
 
 class Tweet:
 
@@ -12,5 +13,3 @@ class Tweet:
         self.episodeID = 0
         self.wordsCounter = 0
         self.ambiguousWordsList = list()
-
-

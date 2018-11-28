@@ -8,7 +8,7 @@ class AnalysisController:
     analyzed_words_counter = 0
 
     lexicon = list()            # List of the words in the NRC lexicon
-                                # and thei emotional and sentimental values
+                                # and their emotional and sentimental values
     words_of_lexicon = list()   # List of only the words in the NRC lexicon
                                 # (no emotional or sentimental values)
 
