@@ -14,3 +14,14 @@ class Tweet:
         self.ambiguousWordsList = list()
 
 
+    def __init__(self,tweet_as_list):
+        self.tweetID = tweet_as_list[2]
+        self.date = tweet_as_list[0]
+        self.userName = tweet_as_list[5]
+        self.text = tweet_as_list[6]
+        self.cleanText = tweet_as_list[9]
+        self.emotionsVec = tweet_as_list[7]
+        self.episodeID = tweet_as_list[8]
+
+        self.wordsCounter = 0
+        self.ambiguousWordsList = list()
