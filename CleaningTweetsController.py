@@ -25,4 +25,3 @@ def SetEpisodeID(tweet):
 
         elif tweet.date > CleaningTweetsController.episodes[7]:
             tweet.episodeID = CleaningTweetsController.episodes[7]
-
