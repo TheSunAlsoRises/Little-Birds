@@ -5,15 +5,13 @@ import Tweet
 import Episode
 
 
-AnalysisController.AnalysisController.analyze_tweets_by_episode()
+#AnalysisController.AnalysisController.analyze_tweets_by_episode()
 
-emotionsVector = [1,2]
+#emotionsVector = [1,2]
 
-cleanText = ["pretty","Jon","is","the","love", "love","of","my","beautiful","life"]
+cleanText = ["Jon","is","not","that","pretty"]
 
-tweet = Tweet.Tweet(1,"1/1/00","name",
-                     "pretty Jon is the love of my beautiful life",
-                     cleanText,[])
+tweet = Tweet.Tweet(1,"1/1/00","name","pretty Jon is not the love of my beautiful life",cleanText,[])
 
 episode = Episode.Episode(1,"","")
 
