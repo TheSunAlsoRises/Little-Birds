@@ -1,5 +1,6 @@
-import pymysql
 
+import pymysql.cursors
+import pymysql
 
 class DBconnect:
 
@@ -10,16 +11,25 @@ class DBconnect:
               host="localhost",
               user="root",
               passwd="root",
-              database="Tweets"
+              database="littlebirds"
         )
 
         mycursor = db.cursor()
         mycursor.execute(query_string)
         result = mycursor.fetchall()
 
-        for x in result:
-          print(x[6])
+        db.commit()
+
+        #for x in result:
+        #  print(x[0])
 
         db.close()
-
         return result
+
+    @staticmethod
+    def tuple_to_list(query):
+        emptyList = list()
+        result = DBconnect.send_query(query)
+        for i in range(0, len(result)):
+            emptyList.append(list(result[i]))
+        return emptyList
