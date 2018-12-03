@@ -10,6 +10,8 @@ class ScriptFilesController:
 
     @staticmethod
     def file_to_scriptLines():
+        # Important note: the script must not contain quotes (")
+
         # Perhaps get these two as parameters
         file = open("C://Users\אליה\PycharmProjects\script1.txt", "r")
         scriptID = 1
