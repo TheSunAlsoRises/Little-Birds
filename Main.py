@@ -9,7 +9,9 @@ import Episode
 
 #emotionsVector = [1,2]
 
-AnalysisController.AnalysisController.upload_tweets_file()
+AnalysisController.AnalysisController.analyze_scriptlines_by_script()
+
+#DBconnect.DBconnect.upload_tweets_file()
 
 #cleanText = ["Jon","is","not","that","pretty"]
 

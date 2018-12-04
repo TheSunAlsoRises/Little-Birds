@@ -3,11 +3,14 @@ import DBconnect
 import Tweet
 import Word
 import Episode
+import Script
+import ScriptLine
 
 
 class AnalysisController:
 
-    analyzed_words_counter = 0
+    analyzed_tweets_words_counter = 0
+    analyzed_scriptlines_words_counter = 0
     lexicon = list()                # List of the words in the NRC lexicon and their emotional and sentimental values
     words_of_lexicon = list()       # List of the lexicon's words (without values)
     negation_words = list()         # List of words that negate words
@@ -42,7 +45,7 @@ class AnalysisController:
 
             # TODO: replace with:
 
-            #tweets_of_episode = DBconnect.DBconnect.tuple_to_list\
+            #result = DBconnect.DBconnect.tuple_to_list\
             # ("SELECT * FROM littlebirds.tweet WHERE littlebirds.tweet.EpisodeID = " + str(episodes.episodeID))
 
             # Analyze the tweets of each episode
@@ -82,7 +85,7 @@ class AnalysisController:
                     continue    # Skip to next word
 
             # Increment the counter: another word will be analyzed now
-            AnalysisController.analyzed_words_counter += 1
+            AnalysisController.analyzed_tweets_words_counter += 1
 
             # Get the emotional and sentimental values of the word
             word_emotions = AnalysisController.lexicon[index_in_lexicon]
@@ -162,8 +165,8 @@ class AnalysisController:
                         # If enough instances were collected, find the ambiguous-word's emotion
                         # with maximal value, and the ones that are close enough to it
                         if episode.ambiguousWordsList_instancesCount[ambig_word_index] >= \
-                            0.01 * AnalysisController.analyzed_words_counter \
-                            and AnalysisController.analyzed_words_counter > 3:
+                            0.01 * AnalysisController.analyzed_tweets_words_counter \
+                            and AnalysisController.analyzed_tweets_words_counter > 3:
                             #try:
                             # Add if it already exists
                             #if len(episode.ambiguousWordsList_emotionsVector[ambig_word_index]) > 0:
@@ -177,7 +180,7 @@ class AnalysisController:
 
                             # Select the emotions with high values with a '1'
                             for i in range(0, 8):
-                                if episode.ambiguousWordsList[ambig_word_index][i] >= 0.9 * maximal_emotion:
+                                if episode.ambiguousWordsList_emotionsVector[ambig_word_index][i] >= 0.9 * maximal_emotion:
                                     top_emotions[i] = 1
 
                             # Check if 'top_emotions' holds positive emotions
@@ -214,15 +217,17 @@ class AnalysisController:
 
                         #except IndexError:
 
-                        #if episode.ambiguousWordsList_instancesCount[ambig_word_index] < 0.01 * AnalysisController.analyzed_words_counter:
+                        #if episode.ambiguousWordsList_instancesCount[ambig_word_index] < 0.01 * AnalysisController.analyzed_tweets_words_counter:
                         # Not enough instances of this word yet to gather a context
                         else:
                             continue
 
         # Normalize the tweet's emotions vector
         maximal_emotion = max(tweet.emotionsVec)
-        for i in range(0, 8):
-            tweet.emotionsVec[i] = tweet.emotionsVec[i] / maximal_emotion
+        # Not to divide by zero
+        if maximal_emotion > 0:
+            for i in range(0, 8):
+                tweet.emotionsVec[i] = tweet.emotionsVec[i] / maximal_emotion
 
         # Increase the values of the episode's ambiguous words vectors
         # with the ambiguous words that appeared in the tweet, to update
@@ -243,34 +248,265 @@ class AnalysisController:
 
 
     @staticmethod
+    def analyze_scriptlines_by_script():
+
+        # Get the lexicon from the DB
+        result = DBconnect.DBconnect.send_query("SELECT * FROM littlebirds.word;")
+        for i in range(0, len(result)):
+            AnalysisController.lexicon.append(list(result[i]))
+            AnalysisController.words_of_lexicon.append((AnalysisController.lexicon[i])[0])
+
+        # Get the negating words from the DB
+        result = DBconnect.DBconnect.tuple_to_list \
+            ("SELECT Expression FROM littlebirds.expression where expression.Discriminator = 2;")
+        for i in range(0, len(result)):
+            AnalysisController.negation_words.append((result[i])[0])
+
+        # Get the scripts from the DB
+        result = DBconnect.DBconnect.tuple_to_list \
+            ("SELECT * FROM littlebirds.script;")
+        scripts = list()
+        for script in result:
+            scripts.append(Script.Script(script))
+
+        # Get the tweets of each episode from the DB
+        for script in scripts:
+            # result = DBconnect.DBconnect.tuple_to_list \
+            #     ("SELECT * FROM littlebirds.scriptline WHERE littlebirds.scriptline.ScriptID = " + "1")
+
+            result = DBconnect.DBconnect.tuple_to_list\
+            ("SELECT * FROM littlebirds.scriptline WHERE littlebirds.scriptline.ScriptID = " + str(script.scriptID))
+
+            # Analyze the tweets of each episode
+            scriptlines_of_script = list()
+            scriptlines_index = 0
+            for scriptline in result:
+                scriptlines_of_script.insert(scriptlines_index, ScriptLine.ScriptLine(scriptline))
+                AnalysisController.analyze_scriptline(scriptlines_of_script[scriptlines_index], script)
+                scriptlines_index = + 1
+
+
+    # Analyzes a single script-line
+    @staticmethod
+    def analyze_scriptline(scriptline, script):
+
+        negation_flag = 0  # Signals if the former word was a negation word
+        opposite_vec = list()  # Holds an vector with opposite values of emotions for negation
+
+        # Initialize the tweet's emotions vector
+        scriptline.emotionsVec = list()
+        for i in range(0, 8):
+            scriptline.emotionsVec.append(0)
+
+        for word in scriptline.cleanText:
+            # Check if the word appear in the lexicon
+            try:
+                index_in_lexicon = AnalysisController.words_of_lexicon.index(word)
+            except ValueError:
+                # The word doesn't appear in the lexicon
+                try:
+                    # Check if the word is a negation word
+                    AnalysisController.negation_words.index(word)
+                    negation_flag = 1  # Signal for the next word that this word was negative
+                    continue  # Continue to next word
+                except ValueError:
+                    # The word is not a negation word either
+                    continue  # Skip to next word
+
+            # Increment the counter: another word will be analyzed now
+            AnalysisController.analyzed_scriptlines_words_counter += 1
+
+            # Get the emotional and sentimental values of the word
+            word_emotions = AnalysisController.lexicon[index_in_lexicon]
+
+            if word_emotions[10] == 1 and word_emotions[9] == 0:
+                # The word is positive and not-negative
+                # Increment the tweet's emotions vector by 1, in the cells
+                # of the positive/neutral emotions that the word has
+                # positive: joy, anticipation, trust
+                # neutral: surprise
+                # (insert to 'i-1' because the tuple has the word in '0'
+                if negation_flag == 0:
+                    for i in range(4, 8):
+                        if word_emotions[i] == 1:
+                            scriptline.emotionsVec[i] += 1
+
+                # For each emotion that the negation of the word represents:
+                # Increase the tweet's vector (for the negative emotions only)
+                else:
+                    if negation_flag == 1:
+                        opposite_vec = AnalysisController.opposite_vector(word_emotions)
+                        for i in range(0, 5):
+                            if opposite_vec[i] == 1:
+                                scriptline.emotionsVec[i] += 1
+
+            else:
+                if word_emotions[10] == 0 and word_emotions[9] == 1:
+                    # The word is negative and not-positive
+                    # Increment the tweet's emotions vector by 1, in the cells
+                    # of the negative/neutral emotions that the word has
+                    # negative: anger, disgust, fear, sadness
+                    # neutral: surprise
+                    # (insert to 'i-1' because the tuple has the word in '0'
+                    if negation_flag == 0:
+                        for i in range(0, 5):
+                            if word_emotions[i] == 1:
+                                scriptline.emotionsVec[i] += 1
+
+                    # For each emotion that the negation of the word represents:
+                    # Increase the tweet's vector (for the negative emotions only)
+                    else:
+                        if negation_flag == 1:
+                            opposite_vec = AnalysisController.opposite_vector(scriptline.emotionsVec)
+                            for i in range(4, 8):
+                                if opposite_vec[i] == 1:
+                                    scriptline.emotionsVec[i] += 1
+
+                else:
+                    if (word_emotions[10] == 0 and word_emotions[9] == 0) or \
+                            (word_emotions[10] == 1 and word_emotions[9] == 1):
+                        # The word is either not-negative and not-positive or
+                        # both negative and positive
+                        # Infer the emotional tendency of the word by the context of the
+                        # other tweets it appears in, which refer to the same episode
+
+                        # Look for the word in the tweet's ambiguous words list
+                        # Insert if not there already
+                        # These list will help modify the context for the episode's
+                        # ambiguous words list
+                        try:
+                            ambig_word_index = scriptline.ambiguousWordsList.index(word)
+                        except ValueError:
+                            scriptline.ambiguousWordsList.append(word)  # Add the word to the list
+
+                        # Look for the word in the episode's ambiguous words list
+                        # Insert if not there, and continue to check the next word
+                        # (if its not in the episode's list, then it obviously has no context yet)
+                        try:
+                            ambig_word_index = script.ambiguousWordsList.index(word)  # Get the word's index
+                            script.ambiguousWordsList_instancesCount[ambig_word_index] += 1  # Update counter
+                        except ValueError:
+                            script.ambiguousWordsList.append(word)  # Add the word to the list
+                            ambig_word_index = script.ambiguousWordsList.index(word)  # Get the insertion index
+                            script.ambiguousWordsList_instancesCount.insert(ambig_word_index, 1)  # Initiate counter
+                            continue
+
+                        # If enough instances were collected, find the ambiguous-word's emotion
+                        # with maximal value, and the ones that are close enough to it
+                        if script.ambiguousWordsList_instancesCount[ambig_word_index] >= \
+                                0.01 * AnalysisController.analyzed_scriptlines_words_counter \
+                                and AnalysisController.analyzed_scriptlines_words_counter > 3:
+                            # try:
+                            # Add if it already exists
+                            # if len(episode.ambiguousWordsList_emotionsVector[ambig_word_index]) > 0:
+                            maximal_emotion = max(script.ambiguousWordsList_emotionsVector[ambig_word_index])
+                            max_index = script.ambiguousWordsList_emotionsVector[ambig_word_index].index(
+                                maximal_emotion)
+
+                            # Initialize a list for emotions with close value to 'top_emotions'
+                            top_emotions = list()
+                            for i in range(0, 8):
+                                top_emotions.append(0)
+
+                            # Select the emotions with high values with a '1'
+                            for i in range(0, 8):
+                                if script.ambiguousWordsList_emotionsVector[ambig_word_index][i] >= 0.9 * maximal_emotion:
+                                    top_emotions[i] = 1
+
+                            # Check if 'top_emotions' holds positive emotions
+                            positive = 0
+                            for i in range(0, 3):
+                                if top_emotions[i] == 1:
+                                    positive = 1
+
+                            # Check if 'top_emotions' holds negative emotions
+                            negative = 0
+                            for i in range(4, 8):
+                                if top_emotions[i] == 1:
+                                    negative = 1
+
+                            # The word is still ambiguous, skip to the next word
+                            if positive == 1 and negative == 1:
+                                continue
+
+                            # If a context was collected, raise the values for each
+                            # emotion in 'top_emotions'
+                            if negation_flag == 1:
+                                for i in range(0, 8):
+                                    if top_emotions[i] == 1:
+                                        scriptline.emotionsVec[i] += 1
+
+                            # For each emotion that the opposite of the word's top-emotions vector represents:
+                            # Increase the tweet's vector (both for positive and negative emotions)
+                            else:
+                                if negation_flag == 1:
+                                    opposite_vec = AnalysisController.opposite_vector(top_emotions)
+                                    for i in range(0, 8):
+                                        if opposite_vec[i] == 1:
+                                            scriptline.emotionsVec[i] += 1
+
+                        # except IndexError:
+
+                        # if episode.ambiguousWordsList_instancesCount[ambig_word_index] < 0.01 * AnalysisController.analyzed_tweets_words_counter:
+                        # Not enough instances of this word yet to gather a context
+                        else:
+                            continue
+
+        # Normalize the tweet's emotions vector
+        maximal_emotion = max(scriptline.emotionsVec)
+        # Not to divide by zero
+        if maximal_emotion > 0:
+            for i in range(0, 8):
+                scriptline.emotionsVec[i] = scriptline.emotionsVec[i] / maximal_emotion
+
+        # Increase the values of the episode's ambiguous words vectors
+        # with the ambiguous words that appeared in the tweet, to update
+        # the episode's context
+        for word in scriptline.ambiguousWordsList:
+            ambig_word_index = script.ambiguousWordsList.index(word)
+            try:
+                # Add if it already exists
+                if len(script.ambiguousWordsList_emotionsVector[ambig_word_index]) > 0:
+                    for i in range(0, 8):
+                        script.ambiguousWordsList_emotionsVector[ambig_word_index][i] += scriptline.emotionsVec[i]
+
+            except IndexError:
+                # Initialize if the list is empty
+                script.ambiguousWordsList_emotionsVector.insert(ambig_word_index, list())
+                for i in range(0, 8):
+                    script.ambiguousWordsList_emotionsVector[ambig_word_index].append(scriptline.emotionsVec[i])
+
+
+    @staticmethod
     def opposite_vector(original_vec):
         opposite_vec = list()
         # Switch the values of each opposite couple of emotions
         # if both are '0' or '1' -> stats the same
         # if one is '1' and the other is '0' -> switched
 
-        opposite_vec.insert(0, original_vec[0])      # Insert word
-        opposite_vec.insert(1, original_vec[3])      # anger <- fear
-        opposite_vec.insert(2, original_vec[8])      # disgust <- trust
-        opposite_vec.insert(3, original_vec[1])      # fear <- anger
-        opposite_vec.insert(4, original_vec[6])      # sadness <- joy
-        opposite_vec.insert(5, original_vec[7])      # surprise <- anticipation
-        opposite_vec.insert(6, original_vec[4])      # joy <- sadness
-        opposite_vec.insert(7, original_vec[5])      # anticipation <- surprise
-        opposite_vec.insert(8, original_vec[2])      # trust <- disgust
-        opposite_vec.insert(9, original_vec[10])     # negative <- positive
-        opposite_vec.insert(10, original_vec[9])     # positive <- negative
+        # Tweet's emotions vector
+        if len(original_vec) == 11:
+            opposite_vec.insert(0, original_vec[0])      # Insert word
+            opposite_vec.insert(1, original_vec[3])      # anger <- fear
+            opposite_vec.insert(2, original_vec[8])      # disgust <- trust
+            opposite_vec.insert(3, original_vec[1])      # fear <- anger
+            opposite_vec.insert(4, original_vec[6])      # sadness <- joy
+            opposite_vec.insert(5, original_vec[7])      # surprise <- anticipation
+            opposite_vec.insert(6, original_vec[4])      # joy <- sadness
+            opposite_vec.insert(7, original_vec[5])      # anticipation <- surprise
+            opposite_vec.insert(8, original_vec[2])      # trust <- disgust
+            opposite_vec.insert(9, original_vec[10])     # negative <- positive
+            opposite_vec.insert(10, original_vec[9])     # positive <- negative
+
+        # Script-line's emotions vector
+        elif len(original_vec) == 8:
+            opposite_vec.insert(0, original_vec[2])  # anger <- fear
+            opposite_vec.insert(1, original_vec[7])  # disgust <- trust
+            opposite_vec.insert(2, original_vec[0])  # fear <- anger
+            opposite_vec.insert(3, original_vec[5])  # sadness <- joy
+            opposite_vec.insert(4, original_vec[6])  # surprise <- anticipation
+            opposite_vec.insert(5, original_vec[3])  # joy <- sadness
+            opposite_vec.insert(6, original_vec[4])  # anticipation <- surprise
+            opposite_vec.insert(7, original_vec[1])  # trust <- disgust
 
         return opposite_vec
-
-
-    #Upload a whole csv file of tweets to DB
-    @staticmethod
-    def upload_tweets_file():
-        query = "load data local infile 'c:/csva.csv' into table tweet" \
-                " fields terminated by ',' lines terminated by '\r\n' " \
-                "(Date,@dummy1,TweetID,UserID,Location,UserName,OriginalText,@dummy2,@dummy3,Time);"
-        #Date, Time, Tweet ID, User ID, User Name, Geo Location, Text, WE Score, WE Polarity, hour
-        #use @dummy to skip fields
-
-        DBconnect.DBconnect.send_query(query)
