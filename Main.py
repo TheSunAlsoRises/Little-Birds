@@ -9,13 +9,15 @@ import Episode
 
 #emotionsVector = [1,2]
 
-cleanText = ["Jon","is","not","that","pretty"]
+AnalysisController.AnalysisController.upload_tweets_file()
 
-tweet = Tweet.Tweet(1,"1/1/00","name","pretty Jon is not the love of my beautiful life",cleanText,[])
+#cleanText = ["Jon","is","not","that","pretty"]
 
-episode = Episode.Episode(1,"","")
+#tweet = Tweet.Tweet(1,"1/1/00","name","pretty Jon is not the love of my beautiful life",cleanText,[])
 
-AnalysisController.AnalysisController.analyze_tweet(tweet,episode)
+#episode = Episode.Episode(1,"","")
+
+#AnalysisController.AnalysisController.analyze_tweet(tweet,episode)
 
 
 

@@ -7,10 +7,12 @@ class DBconnect:
     def send_query(query_string):
 
         db = pymysql.connect(
-              host="localhost",
-              user="root",
-              passwd="root",
-              database="littlebirds"
+            host="localhost",
+            user="root",
+            passwd="root",
+            database="littlebirds",
+            # Allows "load data local infile"
+            local_infile = True
         )
 
         mycursor = db.cursor()
@@ -19,7 +21,7 @@ class DBconnect:
 
         #for x in result:
         #  print(x[0])
-
+        db.commit()
         db.close()
         return result
 

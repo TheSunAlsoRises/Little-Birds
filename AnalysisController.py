@@ -12,21 +12,21 @@ class AnalysisController:
     words_of_lexicon = list()       # List of the lexicon's words (without values)
     negation_words = list()         # List of words that negate words
 
-    # Get the lexicon from the DB
-    result = DBconnect.DBconnect.send_query("SELECT * FROM littlebirds.word;")
-    for i in range(0, len(result)):
-        lexicon.append(list(result[i]))
-        words_of_lexicon.append((lexicon[i])[0])
-
-    # Get the negating words from the DB
-    result = DBconnect.DBconnect.tuple_to_list\
-        ("SELECT Expression FROM littlebirds.expression where expression.Discriminator = 2;")
-    for i in range(0, len(result)):
-        negation_words.append((result[i])[0])
-
 
     @staticmethod
     def analyze_tweets_by_episode():
+
+        # Get the lexicon from the DB
+        result = DBconnect.DBconnect.send_query("SELECT * FROM littlebirds.word;")
+        for i in range(0, len(result)):
+            AnalysisController.lexicon.append(list(result[i]))
+            AnalysisController.words_of_lexicon.append((AnalysisController.lexicon[i])[0])
+
+        # Get the negating words from the DB
+        result = DBconnect.DBconnect.tuple_to_list \
+            ("SELECT Expression FROM littlebirds.expression where expression.Discriminator = 2;")
+        for i in range(0, len(result)):
+            AnalysisController.negation_words.append((result[i])[0])
 
         # Get the episodes from the DB
         result = DBconnect.DBconnect.tuple_to_list\
@@ -52,7 +52,6 @@ class AnalysisController:
                 tweets_of_episode.insert(tweets_index, Tweet.Tweet(tweet))
                 AnalysisController.analyze_tweet(tweets_of_episode[tweets_index], episode)
                 tweets_index =+ 1
-
 
 
     # Analyzes a single tweet
@@ -263,3 +262,15 @@ class AnalysisController:
         opposite_vec.insert(10, original_vec[9])     # positive <- negative
 
         return opposite_vec
+
+
+    #Upload a whole csv file of tweets to DB
+    @staticmethod
+    def upload_tweets_file():
+        query = "load data local infile 'c:/csva.csv' into table tweet" \
+                " fields terminated by ',' lines terminated by '\r\n' " \
+                "(Date,@dummy1,TweetID,UserID,Location,UserName,OriginalText,@dummy2,@dummy3,Time);"
+        #Date, Time, Tweet ID, User ID, User Name, Geo Location, Text, WE Score, WE Polarity, hour
+        #use @dummy to skip fields
+
+        DBconnect.DBconnect.send_query(query)
