@@ -1,6 +1,6 @@
 
+import pymysql.cursors
 import pymysql
-
 
 class DBconnect:
 
@@ -20,11 +20,11 @@ class DBconnect:
         mycursor.execute(query_string)
         result = mycursor.fetchall()
 
-        #for x in result:
-        #  print(x[0])
         db.commit()
+
         db.close()
         return result
+
 
     @staticmethod
     def tuple_to_list(query):
@@ -33,6 +33,7 @@ class DBconnect:
         for i in range(0, len(result)):
             emptyList.append(list(result[i]))
         return emptyList
+
 
     #Upload a whole csv file of tweets to DB
     @staticmethod

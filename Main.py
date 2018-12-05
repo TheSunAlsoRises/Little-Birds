@@ -3,7 +3,9 @@ import DBconnect
 import AnalysisController
 import Tweet
 import Episode
+import ScriptFilesController
 
+ScriptFilesController.ScriptFilesController.file_to_scriptLines()
 
 #AnalysisController.AnalysisController.analyze_tweets_by_episode()
 
@@ -24,4 +26,6 @@ AnalysisController.AnalysisController.analyze_scriptlines_by_script()
 
 
 #query_string = "SELECT count(*) FROM tweet"
+#query_string = "SELECT * FROM tweets"
+
 #result = DBconnect.DBconnect.send_query(query_string)
