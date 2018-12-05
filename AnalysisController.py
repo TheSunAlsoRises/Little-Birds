@@ -9,6 +9,8 @@ import ScriptLine
 
 class AnalysisController:
 
+    sum_all_lines_emotions = 0
+
     analyzed_tweets_words_counter = 0
     analyzed_scriptlines_words_counter = 0
     lexicon = list()                # List of the words in the NRC lexicon and their emotional and sentimental values
@@ -69,7 +71,9 @@ class AnalysisController:
         for i in range(0, 8):
             tweet.emotionsVec.append(0)
 
-        for word in tweet.cleanText:
+        cleanTextList = list(tweet.cleanText.split())
+
+        for word in cleanTextList:
             # Check if the word appear in the lexicon
             try:
                 index_in_lexicon = AnalysisController.words_of_lexicon.index(word)
@@ -166,7 +170,8 @@ class AnalysisController:
                         # with maximal value, and the ones that are close enough to it
                         if episode.ambiguousWordsList_instancesCount[ambig_word_index] >= \
                             0.01 * AnalysisController.analyzed_tweets_words_counter \
-                            and AnalysisController.analyzed_tweets_words_counter > 3:
+                            and AnalysisController.analyzed_tweets_words_counter > 3 \
+                            and len(episode.ambiguousWordsList_emotionsVector) > ambig_word_index:
                             #try:
                             # Add if it already exists
                             #if len(episode.ambiguousWordsList_emotionsVector[ambig_word_index]) > 0:
@@ -222,12 +227,27 @@ class AnalysisController:
                         else:
                             continue
 
-        # Normalize the tweet's emotions vector
         maximal_emotion = max(tweet.emotionsVec)
+        emotionsVecAsString = ""
+
         # Not to divide by zero
         if maximal_emotion > 0:
             for i in range(0, 8):
+                AnalysisController.sum_all_lines_emotions += tweet.emotionsVec[i]
                 tweet.emotionsVec[i] = tweet.emotionsVec[i] / maximal_emotion
+                tweet.emotionsVec[i] = round(tweet.emotionsVec[i], 3)
+                emotionsVecAsString += str(tweet.emotionsVec[i]) + " "
+            emotionsVecAsString = emotionsVecAsString[:-1]  # Lose last whitespace
+        else:
+            emotionsVecAsString = "0 0 0 0 0 0 0 0"
+
+        # Update the vector in the tweet's DB tuple
+        query = "UPDATE scriptline" \
+                " SET EmotionsVec = " + "'" + emotionsVecAsString + "'" + \
+                " WHERE LineID = " + str(tweet.tweetID) + ";"
+        DBconnect.DBconnect.send_query(query)
+
+        print(tweet.tweetID)
 
         # Increase the values of the episode's ambiguous words vectors
         # with the ambiguous words that appeared in the tweet, to update
@@ -283,7 +303,7 @@ class AnalysisController:
             for scriptline in result:
                 scriptlines_of_script.insert(scriptlines_index, ScriptLine.ScriptLine(scriptline))
                 AnalysisController.analyze_scriptline(scriptlines_of_script[scriptlines_index], script)
-                scriptlines_index = + 1
+                scriptlines_index += 1
 
 
     # Analyzes a single script-line
@@ -298,7 +318,9 @@ class AnalysisController:
         for i in range(0, 8):
             scriptline.emotionsVec.append(0)
 
-        for word in scriptline.cleanText:
+        cleanTextList = list(scriptline.cleanText.split())
+
+        for word in cleanTextList:
             # Check if the word appear in the lexicon
             try:
                 index_in_lexicon = AnalysisController.words_of_lexicon.index(word)
@@ -395,10 +417,11 @@ class AnalysisController:
                         # with maximal value, and the ones that are close enough to it
                         if script.ambiguousWordsList_instancesCount[ambig_word_index] >= \
                                 0.01 * AnalysisController.analyzed_scriptlines_words_counter \
-                                and AnalysisController.analyzed_scriptlines_words_counter > 3:
+                                and AnalysisController.analyzed_scriptlines_words_counter > 3\
+                                and len(script.ambiguousWordsList_emotionsVector)>ambig_word_index:
                             # try:
                             # Add if it already exists
-                            # if len(episode.ambiguousWordsList_emotionsVector[ambig_word_index]) > 0:
+                            # if len(script.ambiguousWordsList_emotionsVector[ambig_word_index]) > 0:
                             maximal_emotion = max(script.ambiguousWordsList_emotionsVector[ambig_word_index])
                             max_index = script.ambiguousWordsList_emotionsVector[ambig_word_index].index(
                                 maximal_emotion)
@@ -452,12 +475,29 @@ class AnalysisController:
                         else:
                             continue
 
-        # Normalize the tweet's emotions vector
+        # Normalize the script-lines' emotions vector and save it as string (to save in DB)
         maximal_emotion = max(scriptline.emotionsVec)
+        emotionsVecAsString = ""
+
         # Not to divide by zero
         if maximal_emotion > 0:
             for i in range(0, 8):
+                AnalysisController.sum_all_lines_emotions += scriptline.emotionsVec[i]
                 scriptline.emotionsVec[i] = scriptline.emotionsVec[i] / maximal_emotion
+                scriptline.emotionsVec[i] = round(scriptline.emotionsVec[i],3)
+                emotionsVecAsString += str(scriptline.emotionsVec[i]) + " "
+            emotionsVecAsString = emotionsVecAsString[:-1]  # Lose last whitespace
+        else:
+            emotionsVecAsString = "0 0 0 0 0 0 0 0"
+
+
+        # Update the vector in the tweet's DB tuple
+        query = "UPDATE scriptline" \
+                " SET EmotionsVec = " + "'" + emotionsVecAsString + "'" + \
+                " WHERE LineID = " + str(scriptline.lineID) + ";"
+        DBconnect.DBconnect.send_query(query)
+
+        print(scriptline.lineID)
 
         # Increase the values of the episode's ambiguous words vectors
         # with the ambiguous words that appeared in the tweet, to update
@@ -476,6 +516,7 @@ class AnalysisController:
                 for i in range(0, 8):
                     script.ambiguousWordsList_emotionsVector[ambig_word_index].append(scriptline.emotionsVec[i])
 
+        #print(AnalysisController.sum_all_lines_emotions)   # Total amount of  meaningful words in the scriptlines
 
     @staticmethod
     def opposite_vector(original_vec):
