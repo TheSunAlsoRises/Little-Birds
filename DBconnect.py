@@ -17,8 +17,6 @@ class DBconnect:
         mycursor.execute(query_string)
         result = mycursor.fetchall()
 
-        for x in result:
-          print(x[0])
-
+        db.commit()
         db.close()
         return result

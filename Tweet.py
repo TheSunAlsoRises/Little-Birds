@@ -9,7 +9,6 @@ class Tweet:
         self.text = text
         self.cleanText = cleanText
         self.emotionsVec = emotionsVec
-
         self.episodeID = 0
         self.wordsCounter = 0
         self.ambiguousWordsList = list()
