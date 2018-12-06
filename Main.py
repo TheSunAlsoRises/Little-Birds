@@ -18,6 +18,7 @@ result = DBconnect.DBconnect.send_query(query_string)
 
 result = tupleToList(result)
 
+
 for i in result:
     tmp = i
     tmp = ''.join(tmp)
