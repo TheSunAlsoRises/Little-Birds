@@ -1,7 +1,7 @@
-from nltk.stem import PorterStemmer,WordNetLemmatizer
+from nltk.stem import WordNetLemmatizer
 import DBconnect
 import string
-import Tweet
+import re
 from datetime import datetime
 
 
@@ -15,7 +15,6 @@ def tupleToList(t):
 nicks = list()
 query_string = "SELECT Nick FROM nick"
 result = DBconnect.DBconnect.send_query(query_string)
-
 result = tupleToList(result)
 
 
@@ -44,6 +43,7 @@ for i in result:
     tmp = ''.join(tmp)
     episodesDate.append(tmp)
 
+
 # SAVE DATES AS A DATETIME TYPE IN ORDER TO COMPARE WITH TWO DATES
 dates = list()
 for date in episodesDate:
@@ -51,7 +51,7 @@ for date in episodesDate:
     dates.append(newDate)
 
 tweets = list()
-query_string = "SELECT * FROM tweet WHERE Date like '16_07%'"
+query_string = "SELECT * FROM tweet WHERE Date like '16%'"
 result = DBconnect.DBconnect.send_query(query_string)
 result = tupleToList(result)
 
@@ -85,19 +85,22 @@ for i in result:
     tmp = ''.join(tmp)
     foreign_words.append(tmp)
 
-stemmer = PorterStemmer()
 lemmatiser = WordNetLemmatizer()
 
 for tweet in tweets:
-    delete_flag = 0
     tweet[9] = list()
     txt = tweet[6]
     foreign_words_counter = 0
+    delete_flag = 0
 
     txt = txt.split(" ")
     for word in txt:
         word = word.lower()
- # REMOVE PUNCTUATION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        # REMOVE PUNCTUATION
+        regex = re.compile('[%s]' % re.escape(string.punctuation))
+        word= regex.sub('', word)
+
         while (len(word) > 0):
             if word.find("ud8") == -1 and word.find("u27") == -1:
                 if word in foreign_words:
@@ -105,8 +108,10 @@ for tweet in tweets:
 
                     #IF FORIEGN WORDS COUNTER BIGGER THAN 2 WE DELETE THE TWEET
                     if foreign_words_counter >=2:
+                        q = '"'
                         id = tweet[2]
-                        query_string = "DELETE FROM tweet where TweetID="+id
+                        print(id)
+                        query_string = "DELETE FROM tweet where TweetID="+ q+id+q
                         DBconnect.DBconnect.send_query(query_string)
                         delete_flag = 1
                         break
@@ -137,6 +142,8 @@ for tweet in tweets:
                     word = word.replace(emoji, "" + "")
 
         if delete_flag==1:
+            delete_flag=0
+            foreign_words_counter = 0
             tweet[9]=list()
             break
 
@@ -147,4 +154,7 @@ for tweet in tweets:
         tmp = ''.join(tmp)
         str = str + tmp + " "
 
-    print(str)
+    q = '"'
+    id = tweet[2]
+    query_string = "update tweet set CleanText = " + q + str + q + "where TweetID = " + q + id + q
+    DBconnect.DBconnect.send_query(query_string)

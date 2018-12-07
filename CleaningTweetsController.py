@@ -1,8 +1,8 @@
-from nltk.stem import PorterStemmer,WordNetLemmatizer
+from nltk.stem import WordNetLemmatizer
 import DBconnect
-import Tweet
+import string
+import re
 from datetime import datetime
-
 
 
 #CONVERT TUPLE TO LIST FUNCTION
@@ -12,9 +12,12 @@ def tupleToList(t):
         emptyList.append(list(t[i]))
     return emptyList
 
+
+
 class CleaningTweetsController:
 
     # COLLECT THE NICK NAMES
+
     nicks = list()
     query_string = "SELECT Nick FROM nick"
     result = DBconnect.DBconnect.send_query(query_string)
@@ -93,7 +96,6 @@ class CleaningTweetsController:
             tmp = ''.join(tmp)
             foreign_words.append(tmp)
 
-        stemmer = PorterStemmer()
         lemmatiser = WordNetLemmatizer()
 
         # FOR EACH TWEET WE SPLIT THE TEXT TO WORDS
@@ -104,7 +106,8 @@ class CleaningTweetsController:
             foreign_words_counter = 0
             txt = txt.split(" ")
 
-            # EACH WORD WE CONVERT TO LOWER CASE AND CHECK SOME CONDITIONS:
+            # EACH WORD WE CONVERT TO LOWER CASE AND REMOVE PUNCTUATION.
+            # THEN WE CHECK SOME CONDITIONS:
             # 1. IF IT IS A FOREIGN WORD WE INCREMENT THE FOREIGN WORD COUNTER
             #   1.1 IF THIS COUNTER BIGGER THEN TWO WE DELETE THE TWEET FROM DB
             # 2. IF IT IS ONE OF THE NICK NAMES
@@ -112,16 +115,20 @@ class CleaningTweetsController:
 
             for word in txt:
                 word = word.lower()
+                regex = re.compile('[%s]' % re.escape(string.punctuation))
+                word = regex.sub('', word)
 
                 while (len(word) > 0):
                     if word.find("ud8") == -1 and word.find("u27") == -1:
                         if word in foreign_words:
                             foreign_words_counter += 1
 
-                            # IF FORIEGN WORDS COUNTER BIGGER THAN 2 WE DELETE THE TWEET
-                            if foreign_words_counter >= 2:
+                            #IF FORIEGN WORDS COUNTER BIGGER THAN 2 WE DELETE THE TWEET
+                            if foreign_words_counter >=2:
+                                q = '"'
                                 id = tweet[2]
-                                query_string = "DELETE FROM tweet where TweetID=" + id
+                                print(id)
+                                query_string = "DELETE FROM tweet where TweetID="+ q+id+q
                                 DBconnect.DBconnect.send_query(query_string)
                                 delete_flag = 1
                                 break
@@ -152,5 +159,19 @@ class CleaningTweetsController:
                             word = word.replace(emoji, "" + "")
 
                 if delete_flag == 1:
+                    delete_flag = 0
+                    foreign_words_counter = 0
                     tweet[9] = list()
                     break
+
+            str = ""
+            # CONVERT THE LIST OF THE CLEANING WORDS TO STRING AND INSERT TO DB
+            for i in tweet[9]:
+                tmp = i
+                tmp = ''.join(tmp)
+                str = str + tmp + " "
+
+            q = '"'
+            id = tweet[2]
+            query_string = "update tweet set CleanText = " + q + str + q + "where TweetID = " + q + id + q
+            DBconnect.DBconnect.send_query(query_string)
