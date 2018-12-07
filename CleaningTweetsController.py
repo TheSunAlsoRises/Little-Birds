@@ -59,7 +59,7 @@ class CleaningTweetsController:
 
         # COLLECT ALL TWEETS
     tweets = list()
-    query_string = "SELECT * FROM tweet WHERE Date like '17%'"
+    query_string = "SELECT * FROM tweet"
     result = DBconnect.DBconnect.send_query(query_string)
     result = tupleToList(result)
 
