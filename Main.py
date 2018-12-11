@@ -155,6 +155,7 @@ for tweet in tweets:
         str = str + tmp + " "
 
 
+
     q = '"'
     id = tweet[2]
     query_string = "update tweet set CleanText = " + q + str + q + "where TweetID = " + q + id + q
