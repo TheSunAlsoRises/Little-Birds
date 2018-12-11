@@ -103,15 +103,13 @@ class ScriptFilesController:
                     if words[i] in nicks:
                         # Simply add the words with a meaning in the series
                         clean_text += words[i]
-                        clean_text += ' '
                     else:
                         # Set regular words to their basic form
                         # First option - with stemming : caught 1293 words this way
                         # clean_text += (stemmer.stem(lemmatiser.lemmatize(words[i])))
-
                         # Second option - without stemming : caught 1442 words this way
                         clean_text += (lemmatiser.lemmatize(words[i]))
-                        clean_text += ' '
+                    clean_text += ' '   # Add whitespace between words
                 clean_text = clean_text[:-1]    # Remove last whitespace
 
                 # Also save the original line (without the '\n' character)

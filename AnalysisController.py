@@ -9,6 +9,8 @@ import ScriptLine
 
 class AnalysisController:
 
+    summed_vector = [0] * 8     # Empty list with 8 zeroes
+
     sum_all_lines_emotions = 0
 
     analyzed_tweets_words_counter = 0
@@ -57,7 +59,6 @@ class AnalysisController:
                 tweets_of_episode.insert(tweets_index, Tweet.Tweet(tweet))
                 AnalysisController.analyze_tweet(tweets_of_episode[tweets_index], episode)
                 tweets_index =+ 1
-
 
     # Analyzes a single tweet
     @staticmethod
@@ -133,9 +134,9 @@ class AnalysisController:
                     else:
                         if negation_flag == 1:
                             opposite_vec = AnalysisController.opposite_vector(tweet.emotionsVec)
-                            for i in range(5, 9):
+                            for i in range(4, 8):
                                 if opposite_vec[i] == 1:
-                                    tweet.emotionsVec[i - 1] += 1
+                                    tweet.emotionsVec[i] += 1
 
                 else:
                     if (word_emotions[10] == 0 and word_emotions[9] == 0) or \
@@ -304,7 +305,9 @@ class AnalysisController:
                 scriptlines_of_script.insert(scriptlines_index, ScriptLine.ScriptLine(scriptline))
                 AnalysisController.analyze_scriptline(scriptlines_of_script[scriptlines_index], script)
                 scriptlines_index += 1
-
+        #print("With amount of analyzed words:")
+        print("With value of maximal emotion:")
+        print(AnalysisController.summed_vector)
 
     # Analyzes a single script-line
     @staticmethod
@@ -350,7 +353,7 @@ class AnalysisController:
                 # (insert to 'i-1' because the tuple has the word in '0'
                 if negation_flag == 0:
                     for i in range(4, 8):
-                        if word_emotions[i] == 1:
+                        if word_emotions[i+1] == 1:
                             scriptline.emotionsVec[i] += 1
 
                 # For each emotion that the negation of the word represents:
@@ -359,7 +362,7 @@ class AnalysisController:
                     if negation_flag == 1:
                         opposite_vec = AnalysisController.opposite_vector(word_emotions)
                         for i in range(0, 5):
-                            if opposite_vec[i] == 1:
+                            if opposite_vec[i+1] == 1:
                                 scriptline.emotionsVec[i] += 1
 
             else:
@@ -372,7 +375,7 @@ class AnalysisController:
                     # (insert to 'i-1' because the tuple has the word in '0'
                     if negation_flag == 0:
                         for i in range(0, 5):
-                            if word_emotions[i] == 1:
+                            if word_emotions[i+1] == 1:
                                 scriptline.emotionsVec[i] += 1
 
                     # For each emotion that the negation of the word represents:
@@ -478,13 +481,21 @@ class AnalysisController:
         # Normalize the script-lines' emotions vector and save it as string (to save in DB)
         maximal_emotion = max(scriptline.emotionsVec)
         emotionsVecAsString = ""
+        scriptline.wordsCounter = len(cleanTextList)
 
         # Not to divide by zero
         if maximal_emotion > 0:
             for i in range(0, 8):
                 AnalysisController.sum_all_lines_emotions += scriptline.emotionsVec[i]
+
+                # The right way to normalize:
                 scriptline.emotionsVec[i] = scriptline.emotionsVec[i] / maximal_emotion
+
+                # Some shallow, small-minded, unnecessary  way to do some useless stuff with numbers:
+                #scriptline.emotionsVec[i] = scriptline.emotionsVec[i] / scriptline.wordsCounter
+
                 scriptline.emotionsVec[i] = round(scriptline.emotionsVec[i],3)
+                AnalysisController.summed_vector[i] += scriptline.emotionsVec[i]
                 emotionsVecAsString += str(scriptline.emotionsVec[i]) + " "
             emotionsVecAsString = emotionsVecAsString[:-1]  # Lose last whitespace
         else:

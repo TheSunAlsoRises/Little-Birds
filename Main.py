@@ -5,8 +5,10 @@ import Tweet
 import Episode
 import ScriptFilesController
 
-ScriptFilesController.ScriptFilesController.file_to_scriptLines("C://Users\אליה\PycharmProjects\script1.txt",1)
-ScriptFilesController.ScriptFilesController.file_to_scriptLines("C://Users\אליה\PycharmProjects\script2.txt",2)
+from PyQt4 import QtGui
+
+#ScriptFilesController.ScriptFilesController.file_to_scriptLines("C://Users\אליה\PycharmProjects\script1.txt",1)
+#ScriptFilesController.ScriptFilesController.file_to_scriptLines("C://Users\אליה\PycharmProjects\script2.txt",2)
 
 #AnalysisController.AnalysisController.analyze_tweets_by_episode()
 
