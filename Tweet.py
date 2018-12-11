@@ -1,3 +1,4 @@
+import Episode
 
 class Tweet:
 
@@ -13,6 +14,7 @@ class Tweet:
         self.cleanText = cleanText
 
         self.wordsCounter = 0
+
         self.ambiguousWordsList = list()
 
     #
@@ -29,4 +31,3 @@ class Tweet:
     #
     #       self.wordsCounter = 0
     #       self.ambiguousWordsList = list()
-    #

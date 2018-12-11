@@ -18,7 +18,10 @@ class AnalysisController:
     lexicon = list()                # List of the words in the NRC lexicon and their emotional and sentimental values
     words_of_lexicon = list()       # List of the lexicon's words (without values)
     negation_words = list()         # List of words that negate words
-
+    lexicon = list()            # List of the words in the NRC lexicon
+                                # and their emotional and sentimental values
+    words_of_lexicon = list()   # List of only the words in the NRC lexicon
+                                # (no emotional or sentimental values)
 
     @staticmethod
     def analyze_tweets_by_episode():
@@ -46,6 +49,7 @@ class AnalysisController:
         for episode in episodes:
             result = DBconnect.DBconnect.tuple_to_list\
                 ("SELECT * FROM littlebirds.tweet WHERE littlebirds.tweet.EpisodeID = " + "1")
+
 
             # TODO: replace with:
 

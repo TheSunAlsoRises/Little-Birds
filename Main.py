@@ -1,11 +1,10 @@
-
+from nltk.stem import WordNetLemmatizer
 import DBconnect
 import AnalysisController
 import Tweet
 import Episode
 import ScriptFilesController
 
-from PyQt4 import QtGui
 
 #ScriptFilesController.ScriptFilesController.file_to_scriptLines("C://Users\אליה\PycharmProjects\script1.txt",1)
 #ScriptFilesController.ScriptFilesController.file_to_scriptLines("C://Users\אליה\PycharmProjects\script2.txt",2)
