@@ -1,4 +1,6 @@
 from nltk.stem import WordNetLemmatizer
+
+import CleaningTweetsController
 import DBconnect
 import AnalysisController
 import Tweet
@@ -13,7 +15,7 @@ import ScriptFilesController
 
 #emotionsVector = [1,2]
 
-AnalysisController.AnalysisController.analyze_scriptlines_by_script()
+CleaningTweetsController.CleaningTweetsController.cleanTweets();
 
 #DBconnect.DBconnect.upload_tweets_file()
 
