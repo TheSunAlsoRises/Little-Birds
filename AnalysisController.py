@@ -47,14 +47,11 @@ class AnalysisController:
 
         # Get the tweets of each episode from the DB
         for episode in episodes:
-            result = DBconnect.DBconnect.tuple_to_list\
-                ("SELECT * FROM littlebirds.tweet WHERE littlebirds.tweet.EpisodeID = " + "1")
-
-
-            # TODO: replace with:
-
             #result = DBconnect.DBconnect.tuple_to_list\
-            # ("SELECT * FROM littlebirds.tweet WHERE littlebirds.tweet.EpisodeID = " + str(episodes.episodeID))
+            #    ("SELECT * FROM littlebirds.tweet WHERE littlebirds.tweet.EpisodeID = " + "1")
+            # TODO: replace with:
+            result = DBconnect.DBconnect.tuple_to_list\
+             ("SELECT * FROM littlebirds.tweet WHERE littlebirds.tweet.EpisodeID = " + str(episode.episodeID))
 
             # Analyze the tweets of each episode
             tweets_of_episode = list()
@@ -245,11 +242,11 @@ class AnalysisController:
             emotionsVecAsString = emotionsVecAsString[:-1]  # Lose last whitespace
         else:
             emotionsVecAsString = "0 0 0 0 0 0 0 0"
-
+        q = '"'
         # Update the vector in the tweet's DB tuple
-        query = "UPDATE scriptline" \
-                " SET EmotionsVec = " + "'" + emotionsVecAsString + "'" + \
-                " WHERE LineID = " + str(tweet.tweetID) + ";"
+        query = "UPDATE tweet" \
+                " SET EmotionsVec = " + q + emotionsVecAsString + q + \
+                " WHERE TweetID = " + q + str(tweet.tweetID) + q + ";"
         DBconnect.DBconnect.send_query(query)
 
         print(tweet.tweetID)
@@ -298,7 +295,7 @@ class AnalysisController:
         for script in scripts:
             # result = DBconnect.DBconnect.tuple_to_list \
             #     ("SELECT * FROM littlebirds.scriptline WHERE littlebirds.scriptline.ScriptID = " + "1")
-
+            # Use instead:
             result = DBconnect.DBconnect.tuple_to_list\
             ("SELECT * FROM littlebirds.scriptline WHERE littlebirds.scriptline.ScriptID = " + str(script.scriptID))
 

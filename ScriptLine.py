@@ -4,11 +4,11 @@ import DBconnect
 
 class ScriptLine:
 
-    result = DBconnect.DBconnect.tuple_to_list ("SELECT count(*) FROM littlebirds.scriptline;")
+    #result = DBconnect.DBconnect.tuple_to_list ("SELECT count(*) FROM littlebirds.scriptline;")
     #for i in range(0, len(result)):
         #nicks.append((result[i])[0])
 
-    static_lines_counter = (result[0])[0]      # Counts all the lines in all the scripts (to give each line a unique IDs
+    #static_lines_counter = (result[0])[0]      # Counts all the lines in all the scripts (to give each line a unique IDs
     # static_scenes_counter = 0     -> Not needed for now
 
 

@@ -40,7 +40,7 @@ class CleaningTweetsController:
 
 
 
-        # COLLECT ALL DATES APISODES
+        # COLLECT ALL DATES EPISODES
         episodesDate = list()
         query_string = "SELECT episode.BroadcastingDate FROM episode"
         result = DBconnect.DBconnect.send_query(query_string)
@@ -129,7 +129,7 @@ class CleaningTweetsController:
                                 if foreign_words_counter >=2:
                                     q = '"'
                                     id = tweet[2]
-                                    print(id)
+                                    #print(id)
                                     query_string = "DELETE FROM tweet where TweetID="+ q+id+q
                                     DBconnect.DBconnect.send_query(query_string)
                                     delete_flag = 1
@@ -166,14 +166,15 @@ class CleaningTweetsController:
                         tweet[9] = list()
                         break
 
-                str = ""
+                str1 = ""
                 # CONVERT THE LIST OF THE CLEANING WORDS TO STRING AND INSERT TO DB
                 for i in tweet[9]:
                     tmp = i
                     tmp = ''.join(tmp)
-                    str = str + tmp + " "
+                    str1 = str1 + tmp + " "
 
                 q = '"'
                 id = tweet[2]
-                query_string = "update tweet set CleanText = " + q + str + q + "where TweetID = " + q + id + q
+                episodeID = tweet[8]
+                query_string = "update tweet set CleanText = " + q + str1 + q + ", EpisodeID = "+ str(episodeID) + " where TweetID = " + q + id + q
                 DBconnect.DBconnect.send_query(query_string)

@@ -5,13 +5,11 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 import re, string
 
 
-
 stemmer = PorterStemmer()
 lemmatiser = WordNetLemmatizer()        # Sets a word into its basic form
 
 
 class ScriptFilesController:
-
 
     # sceneID = 0  -> For now won't be used
     location = ""       # Global, because it affects all the lines in the current scene
@@ -26,12 +24,13 @@ class ScriptFilesController:
 
         file = open(path, "r")
 
-        # Get current amount of scriptlines in the DB, and add '1' for the first line of the current script
-        lines_counter = 1 + ScriptLine.ScriptLine.static_lines_counter
+        # Get current amount of scriptlines in the DB, and add '2' for the first line of the current script
+        # Counts all the lines in all the scripts (to give each line a unique IDs
+        result = DBconnect.DBconnect.tuple_to_list("SELECT count(*) FROM littlebirds.scriptline;")
+        lines_counter = 2 + (result[0])[0]
         speaker = ""
 
-
-        # Get the names and nicks from the DB, so they'l be ignored in the cleaning
+        # Get the names and nicks from the DB, so they'll be ignored in the cleaning
         nicks = list()
         result = DBconnect.DBconnect.tuple_to_list \
             ("SELECT CharacterName FROM littlebirds.category where CategoryID=1"
@@ -45,7 +44,6 @@ class ScriptFilesController:
             nicks.append((result[i])[0])
 
         for line in file:
-
             speaker = ""                                        # Reset for each script-line
 
             if len(line) > 1:              # If the line isn't empty (has characters other than '\n'):
@@ -137,5 +135,5 @@ class ScriptFilesController:
                 print(lines_counter)
 
         # May not be necessary now that we get the amount straigh from the DB (see in class file)
-        ScriptLine.ScriptLine.static_lines_counter += lines_counter         # Update the global number of script-lines
+        #ScriptLine.ScriptLine.static_lines_counter += lines_counter         # Update the global number of script-lines
         file.close()

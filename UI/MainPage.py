@@ -22,42 +22,32 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(800, 515)
-        self.centralwidget = QtGui.QWidget(MainWindow)
-        self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
-        self.pushButton = QtGui.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(350, 300, 75, 23))
-        self.pushButton.setObjectName(_fromUtf8("pushButton"))
-        self.label = QtGui.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(360, 150, 47, 13))
-        self.label.setObjectName(_fromUtf8("label"))
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        self.menubar.setObjectName(_fromUtf8("menubar"))
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtGui.QStatusBar(MainWindow)
-        self.statusbar.setObjectName(_fromUtf8("statusbar"))
-        MainWindow.setStatusBar(self.statusbar)
+class Ui_Form(object):
+    def setupUi(self, Form):
+        Form.setObjectName(_fromUtf8("Form"))
+        Form.resize(400, 309)
+        self.secondary_headline = QtGui.QLabel(Form)
+        self.secondary_headline.setGeometry(QtCore.QRect(60, 110, 261, 41))
+        self.secondary_headline.setAlignment(QtCore.Qt.AlignCenter)
+        self.secondary_headline.setObjectName(_fromUtf8("secondary_headline"))
+        self.headline = QtGui.QLabel(Form)
+        self.headline.setGeometry(QtCore.QRect(40, 20, 319, 121))
+        self.headline.setAlignment(QtCore.Qt.AlignCenter)
+        self.headline.setObjectName(_fromUtf8("headline"))
+        self.start_button = QtGui.QPushButton(Form)
+        self.start_button.setGeometry(QtCore.QRect(110, 200, 171, 41))
+        self.start_button.setObjectName(_fromUtf8("start_button"))
+        self.manager_area_button = QtGui.QPushButton(Form)
+        self.manager_area_button.setGeometry(QtCore.QRect(150, 260, 91, 23))
+        self.manager_area_button.setObjectName(_fromUtf8("manager_area_button"))
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.retranslateUi(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
 
-    def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
-        self.pushButton.setText(_translate("MainWindow", "PushButton", None))
-        self.label.setText(_translate("MainWindow", "TextLabel", None))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    MainWindow = QtGui.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+    def retranslateUi(self, Form):
+        Form.setWindowTitle(_translate("Form", "Form", None))
+        self.secondary_headline.setText(_translate("Form", "What Twitter feels about #Game_of_Thrones", None))
+        self.headline.setText(_translate("Form", "Little Birds", None))
+        self.start_button.setText(_translate("Form", "Start", None))
+        self.manager_area_button.setText(_translate("Form", "Manager area", None))
 

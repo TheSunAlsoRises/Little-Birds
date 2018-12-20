@@ -2,6 +2,7 @@
 import pymysql.cursors
 import pymysql
 
+
 class DBconnect:
 
     @staticmethod
@@ -37,10 +38,10 @@ class DBconnect:
 
     #Upload a whole csv file of tweets to DB
     @staticmethod
-    def upload_tweets_file():
-        query = "load data local infile 'c:/csva.csv' into table tweet" \
-                " fields terminated by ',' lines terminated by '\r\n' " \
-                "(Date,@dummy1,TweetID,UserID,Location,UserName,OriginalText,@dummy2,@dummy3,Time);"
+    def upload_tweets_file(path):
+        query = "load data local infile '" + path + "' into table tweet" \
+                " fields terminated by ',' lines terminated by '\r\n' IGNORE 1 LINES " \
+                "(Date,@dummy1,TweetID,UserID,UserName,Location,OriginalText,@dummy2,@dummy3,@dummy4);"
         #Date, Time, Tweet ID, User ID, User Name, Geo Location, Text, WE Score, WE Polarity, hour
         #use @dummy to skip fields
 

@@ -4,6 +4,24 @@ import AnalysisController
 import Tweet
 import Episode
 import ScriptFilesController
+import ManagerUIsController, ManagerMenuController
+from PyQt4 import QtCore, QtGui
+import sys
+
+if __name__ == "__main__":
+    app = QtGui.QApplication(sys.argv)
+
+    login = ManagerUIsController.LoginWin(None)
+    if not ManagerUIsController.LoginWin.exec_(): # 'reject': user pressed 'Cancel', so quit
+        sys.exit(-1)
+
+    # 'accept': continue
+    ManagerMenuController.ManagerMenuWin(None)
+
+    sys.exit(app.exec_())
+
+
+
 
 
 #ScriptFilesController.ScriptFilesController.file_to_scriptLines("C://Users\אליה\PycharmProjects\script1.txt",1)
@@ -13,7 +31,7 @@ import ScriptFilesController
 
 #emotionsVector = [1,2]
 
-AnalysisController.AnalysisController.analyze_scriptlines_by_script()
+#AnalysisController.AnalysisController.analyze_scriptlines_by_script()
 
 #DBconnect.DBconnect.upload_tweets_file()
 
