@@ -1,5 +1,5 @@
 
-import DBconnect
+import DBconnect, ManagerUIsController
 import Tweet
 import Word
 import Episode
@@ -76,6 +76,7 @@ class AnalysisController:
         cleanTextList = list(tweet.cleanText.split())
 
         for word in cleanTextList:
+
             # Check if the word appear in the lexicon
             try:
                 index_in_lexicon = AnalysisController.words_of_lexicon.index(word)

@@ -27,10 +27,10 @@ class Ui_Form(object):
         Form.setObjectName(_fromUtf8("Form"))
         Form.resize(400, 300)
         self.upload_button = QtGui.QPushButton(Form)
-        self.upload_button.setGeometry(QtCore.QRect(250, 240, 101, 23))
+        self.upload_button.setGeometry(QtCore.QRect(270, 260, 101, 23))
         self.upload_button.setObjectName(_fromUtf8("upload_button"))
         self.back_button = QtGui.QPushButton(Form)
-        self.back_button.setGeometry(QtCore.QRect(40, 240, 101, 23))
+        self.back_button.setGeometry(QtCore.QRect(20, 260, 71, 23))
         self.back_button.setObjectName(_fromUtf8("back_button"))
 
         self.retranslateUi(Form)

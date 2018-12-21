@@ -4,6 +4,47 @@ import ScriptFilesController, DBconnect, CleaningTweetsController, AnalysisContr
 from PyQt4.QtGui import QApplication, QMainWindow, QPushButton, QWidget, QMessageBox
 from PyQt4 import QtGui, QtCore
 
+from PyQt4.QtCore import QThread, SIGNAL
+
+
+class tweetsThread(QThread):
+
+    def __init__(self, urls):
+        QThread.__init__(self)
+        self.urls = urls
+
+    def __del__(self):
+        self.wait()
+
+    def run(self):
+        #  Truncate all the existing tweets
+        DBconnect.DBconnect.send_query("truncate table littlebirds.tweet")
+        # Call function to upload the tweets
+        for url in self.urls:
+            DBconnect.DBconnect.upload_tweets_file(url)
+        # Clean the tweets
+        CleaningTweetsController.CleaningTweetsController.cleanTweets()
+        # Analyze them
+        AnalysisController.AnalysisController.analyze_tweets_by_episode()
+
+
+class scriptsThread(QThread):
+
+    def __init__(self, urls):
+        QThread.__init__(self)
+        self.urls = urls
+
+    def __del__(self):
+        self.wait()
+
+    def run(self):
+        # Truncate all the existing scriptlines
+        DBconnect.DBconnect.send_query("truncate table littlebirds.scriptline")
+        # Call function to upload the scripts
+        for url in self.urls:
+            ScriptFilesController.ScriptFilesController.file_to_scriptLines(url, int((url[-5:])[:1]))
+        AnalysisController.AnalysisController.analyze_scriptlines_by_script()
+
 
 class MainPageUI(QWidget):
     def __init__(self, parent=None):
@@ -17,8 +58,6 @@ class LoginUI(QWidget):
         super(LoginUI, self).__init__(parent)
         self.ui = Login.Ui_Form()
         self.ui.setupUi(self)
-        #self.CPSBTN = QPushButton('text', self)
-        #self.CPSBTN.move(0, 350)
 
 
 class ManagerMenuUI(QWidget):
@@ -26,8 +65,6 @@ class ManagerMenuUI(QWidget):
         super(ManagerMenuUI, self).__init__(parent)
         self.ui = ManagerMenu.Ui_Form()
         self.ui.setupUi(self)
-        #self.CPSBTN = QPushButton("text2", self)
-        #self.CPSBTN.move(100, 350)
 
 
 class UploadUI(QWidget):
@@ -49,16 +86,18 @@ class MainWindow(QMainWindow):
     # Determines whether the user chose to upload scripts or tweets files
     uploadScriptsStatus = 0
     uploadTweetsStatus = 0
+
+    # Paths to files that the manager uploads
     urlsList = list()
 
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setGeometry(50, 50, 400, 450)
         self.setFixedSize(400, 350)
-        #self.startMainPageUI()
+        self.startMainPageUI()
         #self.startErrorMessageUI()
         #self.startUploadUI()
-        self.startGraphUI()
+        #self.startGraphUI()
 
     def startMainPageUI(self):
         self.Window = MainPageUI(self)
@@ -82,9 +121,8 @@ class MainWindow(QMainWindow):
         self.Window.ui.back_button.clicked.connect(self.startMainPageUI)
         #TODO: self.Window.ui.logout_button.clicked.connect(Logout method, and then call self.startMainPageUI)
         self.Window.ui.logout_button.clicked.connect(self.startMainPageUI)
-        self.Window.ui.upload_scripts_button.clicked.connect(self.uploadScripts)
-        self.Window.ui.upload_tweets_button.clicked.connect(self.uploadTweets)
-        #self.ui = Login.Ui_Form()
+        self.Window.ui.upload_data_button.clicked.connect(self.uploadTweets)
+        #self.Window.ui.upload_scripts_button.clicked.connect(self.uploadScripts)
         self.show()
 
     def startLoginUI(self):
@@ -124,8 +162,12 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.Window)
         #self.ui = UploadFrame.Ui_Form()
         #self.ui.setupUi(self)
+        if self.uploadScriptsStatus == 1:
+            # Disable Back option
+            self.Window.ui.back_button.setDisabled(True)
+        else:
+            self.Window.ui.back_button.clicked.connect(self.upload_canceled)
         self.Window.ui.upload_button.clicked.connect(self.upload_requested)
-        self.Window.ui.back_button.clicked.connect(self.upload_canceled)
         self.show()
 
     def pictureDropped(self, l):
@@ -152,29 +194,23 @@ class MainWindow(QMainWindow):
                     self.startUploadUI()
                     return
 
-                # Check file name format
-                #if str.isdigit((url[-5:])[:1]) == False or (url[-6:])[:1] != '/':
-                #    showdialog("Upload Rejected", "  File name must be a single digit,\n  that represents the script's number       ", 0)
-                #    self.urlsList = list()
-                #    self.startUploadUI()
-                #    return
-
+            # Disable Back option
+            self.Window.ui.back_button.setDisabled(True)
             # Show process message
             item = QtGui.QListWidgetItem("\n\n\nUploading, please wait . . .", self.Window)
-            # Truncate all the existing tweets
-            DBconnect.DBconnect.send_query("truncate table littlebirds.tweet")
-            # Call function to upload the tweets
-            for url in self.urlsList:
-                DBconnect.DBconnect.upload_tweets_file(url)
-            # Clean the tweets
-            CleaningTweetsController.CleaningTweetsController.cleanTweets()
-            # Analyze them
-            AnalysisController.AnalysisController.analyze_tweets_by_episode()
+
+            #thread_args = tuple()
+            #thread_args.__add__(tuple(self.urlsList))
+            #thread = Thread(target=self.threaded_function, args=(thread_args))
+            #thread.start()
+            #thread.join()
+
+            self.thready_palavra = tweetsThread(self.urlsList)
+            self.connect(self.thready_palavra, SIGNAL("finished()"), self.done)
+            self.thready_palavra.start()
+
             # Clean the files list
             self.urlsList = list()
-            # Reload and show successful upload message
-            self.startUploadUI()
-            showdialog("Upload succeeded", "  The files were uploaded successfully        ", 1)
 
         elif len(self.urlsList) != 0 and self.uploadScriptsStatus == 1:
             for url in self.urlsList:
@@ -194,22 +230,31 @@ class MainWindow(QMainWindow):
 
             # Show process message
             item = QtGui.QListWidgetItem("\n\n\nUploading, please wait . . .", self.Window)
-            # Truncate all the existing scriptlines
-            DBconnect.DBconnect.send_query("truncate table littlebirds.scriptline")
-            # Call function to upload the scripts
-            for url in self.urlsList:
-                ScriptFilesController.ScriptFilesController.file_to_scriptLines(url, int((url[-5:])[:1]))
-                AnalysisController.AnalysisController.analyze_scriptlines_by_script()
+
+            self.thready_palavra = scriptsThread(self.urlsList)
+            self.connect(self.thready_palavra, SIGNAL("finished()"), self.done)
+            self.thready_palavra.start()
 
             # Clean the files list
             self.urlsList = list()
-            # Reload and show successful upload message
-            self.startUploadUI()
-            showdialog("Upload succeeded", "  The files were uploaded successfully        ", 1)
-
 
     def upload_canceled(self):
         self.startManagerMenuUI()
+
+    def done(self):
+        if self.uploadTweetsStatus == 1:
+            text = "  The tweets were uploaded successfully        "
+            self.uploadScripts()
+        elif self.uploadScriptsStatus == 1:
+            text = "  The scripts were uploaded successfully        "
+            self.startManagerMenuUI()
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setText(text)
+        msg.setWindowTitle("Upload succeeded")
+        msg.setStandardButtons(QMessageBox.Ok)
+        retval = msg.exec_()
+        return msg
 
 
 def showdialog(title, text, status):

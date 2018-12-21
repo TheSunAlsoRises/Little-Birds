@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>200</y>
+     <y>180</y>
      <width>151</width>
      <height>23</height>
     </rect>
@@ -26,25 +26,12 @@
     <string>Logout</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="upload_scripts_button">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>150</y>
-     <width>151</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Upload Scripts (override)</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="back_button">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>260</y>
-     <width>75</width>
+     <width>71</width>
      <height>23</height>
     </rect>
    </property>
@@ -52,24 +39,24 @@
     <string>Back</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="upload_tweets_button">
+  <widget class="QPushButton" name="upload_data_button">
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>100</y>
+     <y>120</y>
      <width>151</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>Upload Tweets (override)</string>
+    <string>Upload Data (override)</string>
    </property>
   </widget>
   <widget class="QLabel" name="headline">
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>50</y>
+     <y>60</y>
      <width>131</width>
      <height>16</height>
     </rect>
