@@ -1,5 +1,5 @@
 from nltk.stem import WordNetLemmatizer
-import DBconnect
+import DBconnect, ManagerUIsController
 import string
 import re
 from datetime import datetime
@@ -102,6 +102,7 @@ class CleaningTweetsController:
 
             # FOR EACH TWEET WE SPLIT THE TEXT TO WORDS
             for tweet in tweets:
+
                 delete_flag = 0
                 tweet[9] = list()
                 txt = tweet[6]
