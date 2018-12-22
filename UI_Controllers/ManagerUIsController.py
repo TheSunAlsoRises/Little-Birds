@@ -55,10 +55,10 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(parent)
         self.setGeometry(50, 50, 400, 450)
         self.setFixedSize(400, 350)
-        #self.startMainPageUI()
+        self.startMainPageUI()
         #self.startErrorMessageUI()
         #self.startUploadUI()
-        self.startGraphUI()
+        #self.startGraphUI()
 
     def startMainPageUI(self):
         self.Window = MainPageUI(self)
