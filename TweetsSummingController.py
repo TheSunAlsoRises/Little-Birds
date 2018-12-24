@@ -40,7 +40,7 @@ class TweetsSummingController:
                 for nick in character_nicks:
                     if nick in tweet[12]:
                         self.total_vector += tweet[10]
-                        #if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
+                        if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
                             #locateRepresentativetweetsprocedure()
                         break
 
@@ -58,22 +58,23 @@ class TweetsSummingController:
                 house_nicks = tupleToList(result)
 
                 #COLLECT ALL CHARATERS FROM SPECIFIC HOUSE
-                characters = ()
-                query_string = "SELECT CharacterName,HouseName FROM category where CharacterName is not null";
+                characters_house = ()
+                query_string = "SELECT CharacterName FROM category where HouseName like '%"+ self.selected
+                +"%' and CharacterName is not null";
                 result = DBconnect.DBconnect.send_query(query_string)
-                characters = tupleToList(result)
+                characters_house = tupleToList(result)
 
                 cleanText = tweet[12].split(" ")
 
                 for nick in house_nicks:
                     if nick in tweet[12]:
                         self.total_vector += tweet[10]
-                       #if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
+                        if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
                             #locateRepresentativetweetsprocedure()
                         stop = 1
                         break
                 if stop == 0:
-                    for character in characters:
+                    for character in characters_house:
                         character_nicks = ()
                         query_string = "SELECT Nick FROM nick where SubID = " \
                                        "(select SubID from nick where Nick = " + '"' + character + '")';
@@ -82,7 +83,7 @@ class TweetsSummingController:
                         for nick in character_nicks:
                             if nick in tweet[12]:
                                 self.total_vector += tweet[10]
-                                #if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
+                                if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
                                     # locateRepresentativetweetsprocedure()
                                 break
 
@@ -104,7 +105,7 @@ class TweetsSummingController:
                 for nick in location_nicks:
                     if nick in tweet[12]:
                         self.total_vector += tweet[10]
-                        #if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
+                        if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
                             #locateRepresentativetweetsprocedure()
                         break
 
