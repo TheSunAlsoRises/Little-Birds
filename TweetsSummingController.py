@@ -20,7 +20,7 @@ class TweetsSummingController:
 
     def tweetSumming(self):
         tweets = ()
-        query_string = "SELECT * FROM tweet WHERE EpisodeID=" + self.requested_episode
+        query_string = "SELECT * FROM tweet WHERE EpisodeID=" + str(self.requested_episode)
         result = DBconnect.DBconnect.send_query(query_string)
         tweets = tupleToList(result)
 
@@ -31,16 +31,25 @@ class TweetsSummingController:
 
                 #COLLECT ALL CHARACTER NICK NAMES
                 character_nicks = ()
+                q = '"'
                 query_string = "SELECT Nick FROM nick where SubID = " \
-                               "(select SubID from nick where Nick = " + '"' + self.selected + '")';
+                               "(select SubID from nick where Nick = " + q + self.selected + q + ")";
                 result = DBconnect.DBconnect.send_query(query_string)
                 character_nicks = tupleToList(result)
+
+                nicks = []
+                for i in character_nicks:
+                    tmp = i
+                    tmp = ''.join(tmp)
+                    nicks.append(tmp)
+                character_nicks = nicks
+
                 cleanText = tweet[12].split(" ")
 
                 for nick in character_nicks:
                     if nick in tweet[12]:
                         self.total_vector += tweet[10]
-                        if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
+                        #if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
                             #locateRepresentativetweetsprocedure()
                         break
 
@@ -50,40 +59,50 @@ class TweetsSummingController:
             for tweet in tweets:
                 self.tweets_counter+=1
 
-                #COLLECT ALL HOUSE NICK NAMES
-                house_nicks = ()
-                query_string = "SELECT Nick FROM nick where SubID = " \
-                               "(select SubID from nick where Nick = " + '"' + self.selected + '")';
-                result = DBconnect.DBconnect.send_query(query_string)
-                house_nicks = tupleToList(result)
-
                 #COLLECT ALL CHARATERS FROM SPECIFIC HOUSE
-                characters_house = ()
-                query_string = "SELECT CharacterName FROM category where HouseName like '%"+ self.selected
-                +"%' and CharacterName is not null";
+                characters_house = []
+
+                q = '"'
+                query_string = "SELECT CharacterName FROM category where HouseName like " + q + "%" + str(self.selected) + "%" + q \
+                               + " and CharacterName is not null";
                 result = DBconnect.DBconnect.send_query(query_string)
                 characters_house = tupleToList(result)
 
-                cleanText = tweet[12].split(" ")
+                characters = []
+                for i in characters_house:
+                    tmp = i
+                    tmp = ''.join(tmp)
+                    characters.append(tmp)
+                characters_house = characters
 
-                for nick in house_nicks:
-                    if nick in tweet[12]:
-                        self.total_vector += tweet[10]
-                        if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
-                            #locateRepresentativetweetsprocedure()
-                        stop = 1
-                        break
+                cleanText = tweet[12].split(" ")
+                house = self.selected
+                if house in tweet[12]:
+                    self.total_vector += tweet[10]
+                    #if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
+                        #locateRepresentativetweetsprocedure()
+                    stop = 1
+                    break
                 if stop == 0:
                     for character in characters_house:
                         character_nicks = ()
+                        q = '"'
                         query_string = "SELECT Nick FROM nick where SubID = " \
-                                       "(select SubID from nick where Nick = " + '"' + character + '")';
+                                       "(select SubID from nick where Nick like " + q + "%" + str(character) + "%" + q + ")";
                         result = DBconnect.DBconnect.send_query(query_string)
                         character_nicks = tupleToList(result)
+
+                        nicks = []
+                        for i in character_nicks:
+                            tmp = i
+                            tmp = ''.join(tmp)
+                            nicks.append(tmp)
+                        character_nicks = nicks
+
                         for nick in character_nicks:
                             if nick in tweet[12]:
                                 self.total_vector += tweet[10]
-                                if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
+                                #if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
                                     # locateRepresentativetweetsprocedure()
                                 break
 
@@ -95,21 +114,37 @@ class TweetsSummingController:
                 self.tweets_counter+=1
 
                 #COLLECT ALL LOCATION NICK NAMES
-                location_nicks = ()
-                query_string = "SELECT Nick FROM nick where SubID = " \
-                               "(select SubID from nick where Nick = " + '"' + self.selected + '")';
-                result = DBconnect.DBconnect.send_query(query_string)
-                location_nicks = tupleToList(result)
-                cleanText = tweet[12].split(" ")
+                #location_nicks = ()
+                #q = '"'
+                #query_string = "SELECT Nick FROM nick where SubID = " \
+                #               "(select SubID from nick where Nick = " + q + str(self.selected) + q + ")";
+                #result = DBconnect.DBconnect.send_query(query_string)
+                #location_nicks = tupleToList(result)
 
-                for nick in location_nicks:
-                    if nick in tweet[12]:
-                        self.total_vector += tweet[10]
-                        if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
+                cleanText = tweet[12].split(" ")
+                location = self.selected
+
+                #for nick in location_nicks:
+                #    if nick in tweet[12]:
+                if location in tweet[12]:
+                    self.total_vector += tweet[10]
+                        #if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
                             #locateRepresentativetweetsprocedure()
-                        break
+                        #break
 
         return self.total_vector
+
+
+
+def locateRepresentativetweetsprocedure():
+    maximal_value = 0
+    normalized_total_vector = [] * 8
+    distance_from_total = 0
+    current_distance1 = 100
+    current_distance2 = 100
+
+    representive_tweet1 = ""
+    representive_tweet2 = ""
 
 
 

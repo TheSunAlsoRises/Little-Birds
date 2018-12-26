@@ -4,22 +4,25 @@ import AnalysisController
 import Tweet
 import Episode
 import ScriptFilesController
+import TweetsSummingController
 import ManagerUIsController, ManagerMenuController
 from PyQt4 import QtCore, QtGui
 import sys
 
 if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
+    #app = QtGui.QApplication(sys.argv)
 
-    login = ManagerUIsController.LoginWin(None)
-    if not ManagerUIsController.LoginWin.exec_(): # 'reject': user pressed 'Cancel', so quit
-        sys.exit(-1)
+    #login = ManagerUIsController.LoginWin(None)
+    #if not ManagerUIsController.LoginWin.exec_(): # 'reject': user pressed 'Cancel', so quit
+    #    sys.exit(-1)
 
     # 'accept': continue
-    ManagerMenuController.ManagerMenuWin(None)
+    #ManagerMenuController.ManagerMenuWin(None)
 
-    sys.exit(app.exec_())
-
+    #sys.exit(app.exec_())
+    newList = (1,4,"location","winterfell")
+    t = TweetsSummingController.TweetsSummingController(newList)
+    res = TweetsSummingController.TweetsSummingController.tweetSumming(t)
 
 
 
