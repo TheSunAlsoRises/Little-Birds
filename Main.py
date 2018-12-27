@@ -20,7 +20,7 @@ if __name__ == "__main__":
     #ManagerMenuController.ManagerMenuWin(None)
 
     #sys.exit(app.exec_())
-    newList = (1,4,"location","winterfell")
+    newList = (1,4,"location","the wall")
     t = TweetsSummingController.TweetsSummingController(newList)
     res = TweetsSummingController.TweetsSummingController.tweetSumming(t)
 
