@@ -17,6 +17,10 @@ class TweetsSummingController:
         self.category = TweetsSumming_as_list[2]
         self.selected = TweetsSumming_as_list[3]
         self.total_vector = [0] * 8
+        self.representive_tweet_ID1=""
+        self.representive_tweet_ID2=""
+        self.tweetText1 = ""
+        self.tweetText2 = ""
 
     def tweetSumming(self):
         tweets = ()
@@ -61,7 +65,7 @@ class TweetsSummingController:
 
                         cleanText = tweet[12].split(" ")
                         if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
-                            self.locateRepresentativetweetsprocedure(self, newVector)
+                            self.locateRepresentativetweetsprocedure(self, tweet)
 
 
         elif (self.category == "house"):
@@ -99,7 +103,7 @@ class TweetsSummingController:
 
                     cleanText = tweet[12].split(" ")
                     if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
-                        self.locateRepresentativetweetsprocedure(self, newVector)
+                        self.locateRepresentativetweetsprocedure(self, tweet)
                     stop = 1
 
                 if stop == 0:
@@ -134,7 +138,7 @@ class TweetsSummingController:
 
                                 cleanText = tweet[12].split(" ")
                                 if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
-                                    self.locateRepresentativetweetsprocedure(self, newVector)
+                                    self.locateRepresentativetweetsprocedure(self, tweet)
 
                 else: stop = 0;
 
@@ -176,38 +180,47 @@ class TweetsSummingController:
 
                             cleanText = tweet[12].split(" ")
                             if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 5:
-                                self.locateRepresentativetweetsprocedure(self, newVector)
+                                self.locateRepresentativetweetsprocedure(self, tweet)
+
+        query_string = "SELECT OriginalText FROM tweet WHERE TweetID like "\
+                       + q + str(self.representive_tweet_ID1) + q + ")";
+        self.tweetText1 = DBconnect.DBconnect.send_query(query_string)
+
+        query_string = "SELECT OriginalText FROM tweet WHERE TweetID like " \
+                       + q + str(self.representive_tweet_ID2) + q + ")";
+        self.tweetText2 = DBconnect.DBconnect.send_query(query_string)
 
         return self.total_vector
 
 
 
-    def locateRepresentativetweetsprocedure(self,tweet_vector):
-        distance_from_total = 0
-        current_distance1 = 100
-        current_distance2 = 100
+    def locateRepresentativetweetsprocedure(self,tweet):
+        self.distance_from_total = 0
+        self.current_distance1 = 100
+        self.current_distance2 = 100
 
-        representive_tweet1 = ""
-        representive_tweet2 = ""
-
+        tweet_vector = tweet[10].split(" ")
         maximal_value = max(self.total_vector)
         normalized_total_vector = self.total_vector
+
         for i in range(len(normalized_total_vector)):
             normalized_total_vector[i] //= maximal_value
 
         substitution_vector = []
         for i in range(len(tweet_vector)):
-            substitution_vector.append(abs(tweet_vector - normalized_total_vector))
+            substitution_vector.append(abs(tweet_vector[i] - normalized_total_vector[i]))
 
         for value in substitution_vector:
-            distance_from_total+=value
+            self.distance_from_total+=value
 
-        if (representive_tweet1 > distance_from_total):
-            representive_tweet2 = representive_tweet1
-            representive_tweet1 = distance_from_total
-
-        elif (representive_tweet2 > distance_from_total):
-            representive_tweet2 = distance_from_total
+        if (self.current_distance1 > self.distance_from_total):
+            self.current_distance2 = self.current_distance1
+            self.representive_tweet_ID2 = self.representive_tweet_ID1
+            self.current_distance1 = self.distance_from_total
+            self.representive_tweet_ID1 = tweet[2]
+        elif (self.current_distance2 > self.distance_from_total):
+            self.current_distance2 = self.distance_from_total
+            self.representive_tweet_ID2 = tweet[2]
             
 
 
