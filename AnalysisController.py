@@ -60,6 +60,7 @@ class AnalysisController:
                 tweets_of_episode.insert(tweets_index, Tweet.Tweet(tweet))
                 AnalysisController.analyze_tweet(tweets_of_episode[tweets_index], episode)
                 tweets_index =+ 1
+                #tweets_index += 1 -> Maybe should be this? still working for now, so...?
 
     # Analyzes a single tweet
     @staticmethod
@@ -231,10 +232,9 @@ class AnalysisController:
                             continue
 
         maximal_emotion = max(tweet.emotionsVec)
-        emotionsVecAsString = ""
-
         # Not to divide by zero
         if maximal_emotion > 0:
+            emotionsVecAsString = ""
             for i in range(0, 8):
                 AnalysisController.sum_all_lines_emotions += tweet.emotionsVec[i]
                 tweet.emotionsVec[i] = tweet.emotionsVec[i] / maximal_emotion
@@ -243,11 +243,17 @@ class AnalysisController:
             emotionsVecAsString = emotionsVecAsString[:-1]  # Lose last whitespace
         else:
             emotionsVecAsString = "0 0 0 0 0 0 0 0"
+            # Just delete the tweet instead:
+            q = '"'
+            query = "DELETE FROM tweet WHERE TweetID = " + q + str(tweet.tweetID) + q
+            DBconnect.DBconnect.send_query(query)
+            #return
+
         q = '"'
         # Update the vector in the tweet's DB tuple
         query = "UPDATE tweet" \
                 " SET EmotionsVec = " + q + emotionsVecAsString + q + \
-                " WHERE TweetID = " + q + str(tweet.tweetID) + q + ";"
+                " WHERE TweetID = " + q + str(tweet.tweetID) + q
         DBconnect.DBconnect.send_query(query)
 
         print(tweet.tweetID)

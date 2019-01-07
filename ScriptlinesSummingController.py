@@ -8,25 +8,23 @@ def tupleToList(t):
     return emptyList
 
 
-class TweetsSummingController:
+class ScriptlinesSummingController:
 
-    def __init__(self, tweetsSummingAsList):
-        self.tweets_counter = 0
-        self.summed_tweets_counter = 0
-        self.requested_episode = tweetsSummingAsList[0]
-    #    self.total_tweets = TweetsSumming_as_list[1]
-        self.total_tweets = 1
-        self.category = tweetsSummingAsList[2]
-        self.selected = tweetsSummingAsList[3]
+    def __init__(self, scriptlinesSummingAsList):
+        self.scriptlines_counter = 0
+        self.summed_scriptlines_counter = 0
+        self.requested_episode = scriptlinesSummingAsList[0]
+    #    self.total_scriptlines = scriptlinesSummingAsList[1]
+        self.total_scriptlines = 1
+        self.category = scriptlinesSummingAsList[2]
+        self.selected = scriptlinesSummingAsList[3]
         self.total_vector = [0] * 8
-        self.representive_tweet_ID1 = ""
-        self.representive_tweet_ID2 = ""
-        self.tweetText1 = ""
-        self.tweetText2 = ""
-        self.author1 = ""
-        self.author2 = ""
+        self.representive_scriptline_ID1 = ""
+        self.representive_scriptline_ID2 = ""
+        self.scriptlineText1 = ""
+        self.scriptlineText2 = ""
 
-    def tweetsSumming(self):
+    def scriptlinesSumming(self):
 
         if self.category == "character":
 
@@ -47,7 +45,7 @@ class TweetsSummingController:
                     nicks.append(tmp)
                 character_nicks = nicks
 
-                allNicksQuery = "SELECT * FROM littlebirds.tweet WHERE EpisodeID = " + str(self.requested_episode) + " AND " \
+                allNicksQuery = "SELECT * FROM littlebirds.scriptline WHERE ScriptID = " + str(self.requested_episode) + " AND " \
                                 "CleanText like " + q + "%" + str(name) + "%" + q
                 for nick in character_nicks:
                     if str(nick) == "ned" or str(nick) == "sam":
@@ -55,26 +53,10 @@ class TweetsSummingController:
                     allNicksQuery += " or CleanText like " + q + "%" + str(nick) + "%" + q
 
                 result = DBconnect.DBconnect.send_query(allNicksQuery)
-                tweets = tupleToList(result)
+                scriptlines = tupleToList(result)
 
-                for tweet in tweets:
-
-                    self.tweets_counter += 1
-                    cleanText = tweet[12]
-
-                    self.summed_tweets_counter += 1
-
-                    vector = tweet[10].split(" ")
-                    newVector = [0.0] * 8
-                    for i in range(len(newVector)):
-                        newVector[i] = float(vector[i])
-
-                    for i in range(len(newVector)):
-                        self.total_vector[i] += newVector[i]
-
-                    cleanText = tweet[12].split(" ")
-                    if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 7:
-                        self.locateRepresentativeTweetsProcedure(tweet)
+                for scriptline in scriptlines:
+                    self.addVector(scriptline)
 
             else:
                 print("not in DB!")
@@ -97,7 +79,7 @@ class TweetsSummingController:
 
             house = self.selected
                                 # Houses names are rare in other meanings, so no need in spaces before and after
-            allCharactersQuery = "SELECT * FROM littlebirds.tweet WHERE EpisodeID = " + str(self.requested_episode) + " AND " \
+            allCharactersQuery = "SELECT * FROM littlebirds.scriptline WHERE ScriptID = " + str(self.requested_episode) + " AND " \
                                  "CleanText like " + q + "%" + str(house) + "%" + q
 
             for character in characters_house:
@@ -126,27 +108,10 @@ class TweetsSummingController:
                     allCharactersQuery += " or CleanText like " + q + "%" + str(nick) + "%" + q
 
             result = DBconnect.DBconnect.send_query(allCharactersQuery)
-            tweets = tupleToList(result)
+            scriptlines = tupleToList(result)
 
-            for tweet in tweets:
-
-                self.tweets_counter += 1
-                cleanText = tweet[12]
-
-                self.summed_tweets_counter += 1
-
-                vector = tweet[10].split(" ")
-                newVector = [0.0] * 8
-                for i in range(len(newVector)):
-                    newVector[i] = float(vector[i])
-
-                for i in range(len(newVector)):
-                    self.total_vector[i] += newVector[i]
-
-                cleanText = tweet[12].split(" ")
-                if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 7:
-                    self.locateRepresentativeTweetsProcedure(tweet)
-                print(tweet[2])
+            for scriptline in scriptlines:
+                self.addVector(scriptline)
 
         elif self.category == "location":
 
@@ -169,60 +134,59 @@ class TweetsSummingController:
                     nicks.append(tmp)
                 location_nicks = nicks
 
-                allNicksQuery = "SELECT * FROM littlebirds.tweet WHERE EpisodeID = " + str(self.requested_episode) + " AND " \
+                allNicksQuery = "SELECT * FROM littlebirds.scriptline WHERE ScriptID = " + str(self.requested_episode) + " AND " \
                                               "CleanText like " + q + "%" + str(location) + "%" + q
                 for nick in location_nicks:
                     allNicksQuery += " or CleanText like " + q + "%" + str(nick) + "%" + q
 
                 result = DBconnect.DBconnect.send_query(allNicksQuery)
-                tweets = tupleToList(result)
+                scriptlines = tupleToList(result)
 
-                for tweet in tweets:
-
-                    self.tweets_counter += 1
-                    cleanText = tweet[12]
-
-                    self.summed_tweets_counter += 1
-
-                    vector = tweet[10].split(" ")
-                    newVector = [0.0] * 8
-                    for i in range(len(newVector)):
-                        newVector[i] = float(vector[i])
-
-                    for i in range(len(newVector)):
-                        self.total_vector[i] += newVector[i]
-
-                    cleanText = tweet[12].split(" ")
-                    if self.tweets_counter > 0.9 * self.total_tweets and len(cleanText) > 7:
-                        self.locateRepresentativeTweetsProcedure(tweet)
+                for scriptline in scriptlines:
+                    self.addVector(scriptline)
 
             else:
                 print("not in DB!")
 
-        query_string = "SELECT OriginalText, UserName FROM tweet WHERE TweetID like "\
-                       + q + str(self.representive_tweet_ID1) + q
+        query_string = "SELECT Text FROM scriptline WHERE LineID like "\
+                       + q + str(self.representive_scriptline_ID1) + q
         result = tupleToList(DBconnect.DBconnect.send_query(query_string))
 
-        self.tweetText1 = result[0][0]
-        self.author1 = result[0][1]
+        self.scriptlineText1 = result[0][0]
 
-        query_string = "SELECT OriginalText, UserName FROM tweet WHERE TweetID like " \
-                       + q + str(self.representive_tweet_ID2) + q
+        query_string = "SELECT Text FROM scriptline WHERE LineID like " \
+                       + q + str(self.representive_scriptline_ID2) + q
         result = tupleToList(DBconnect.DBconnect.send_query(query_string))
 
-        self.tweetText2 = result[0][0]
-        self.author2 = result[0][1]
+        self.scriptlineText2 = result[0][0]
 
-        print("\n\nsummed tweets: " + str(self.summed_tweets_counter) + "\n\n")
-        return [self.total_vector, self.tweetText1, self.author1, self.tweetText2, self.author2, self.summed_tweets_counter]
+        print("\n\nsummed scriptlines: " + str(self.summed_scriptlines_counter) + "\n\n")
+        return [self.total_vector, self.scriptlineText1, self.scriptlineText2, self.summed_scriptlines_counter]
 
+    def addVector(self, scriptline):
 
-    def locateRepresentativeTweetsProcedure(self, tweet):
+        self.scriptlines_counter += 1
+
+        self.summed_scriptlines_counter += 1
+
+        vector = scriptline[1].split(" ")
+        newVector = [0.0] * 8
+        for i in range(len(newVector)):
+            newVector[i] = float(vector[i])
+
+        for i in range(len(newVector)):
+            self.total_vector[i] += newVector[i]
+
+        cleanText = scriptline[3].split(" ")
+        if self.scriptlines_counter > 0.9 * self.total_scriptlines and len(cleanText) > 7:
+            self.locateRepresentativeScriptlinesProcedure(scriptline)
+
+    def locateRepresentativeScriptlinesProcedure(self, scriptline):
         self.distance_from_total = 0
         self.current_distance1 = 100
         self.current_distance2 = 100
 
-        tweet_vector = tweet[10].split(" ")
+        scriptline_vector = scriptline[1].split(" ")
         maximal_value = max(self.total_vector)
         if maximal_value == 0:
             maximal_value = 0.1
@@ -237,18 +201,18 @@ class TweetsSummingController:
             normalized_total_vector[i] = round(normalized_total_vector[i], 3)
 
         substitution_vector = []
-        for i in range(len(tweet_vector)):
-            tweet_vector[i] = float(tweet_vector[i])
-            substitution_vector.append(abs(tweet_vector[i] - normalized_total_vector[i]))
+        for i in range(len(scriptline_vector)):
+            scriptline_vector[i] = float(scriptline_vector[i])
+            substitution_vector.append(abs(scriptline_vector[i] - normalized_total_vector[i]))
 
         for value in substitution_vector:
             self.distance_from_total += value
 
         if (self.current_distance1 > self.distance_from_total):
             self.current_distance2 = self.current_distance1
-            self.representive_tweet_ID2 = self.representive_tweet_ID1
+            self.representive_scriptline_ID2 = self.representive_scriptline_ID1
             self.current_distance1 = self.distance_from_total
-            self.representive_tweet_ID1 = tweet[2]
+            self.representive_scriptline_ID1 = scriptline[0]
         elif (self.current_distance2 > self.distance_from_total):
             self.current_distance2 = self.distance_from_total
-            self.representive_tweet_ID2 = tweet[2]
+            self.representive_scriptline_ID2 = scriptline[0]

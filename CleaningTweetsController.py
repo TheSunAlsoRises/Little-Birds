@@ -13,7 +13,6 @@ def tupleToList(t):
     return emptyList
 
 
-
 class CleaningTweetsController:
 
     @staticmethod
@@ -26,18 +25,15 @@ class CleaningTweetsController:
         result = tupleToList(result)
 
         for i in result:
-            tmp = i
-            tmp = ''.join(tmp)
+            tmp = ''.join(i)
             nicks.append(tmp)
 
         result = nicks
         nicks = ""
 
         for i in result:
-            tmp = i
-            tmp = ''.join(tmp)
+            tmp = ''.join(i)
             nicks = nicks + tmp + "   "
-
 
 
         # COLLECT ALL DATES EPISODES
@@ -47,10 +43,8 @@ class CleaningTweetsController:
         result = tupleToList(result)
 
         for i in result:
-            tmp = i
-            tmp = ''.join(tmp)
+            tmp = ''.join(i)
             episodesDate.append(tmp)
-
 
 
         # SAVE DATES AS A DATETIME TYPE IN ORDER TO COMPARE WITH TWO DATES
@@ -59,15 +53,26 @@ class CleaningTweetsController:
             newDate = datetime.strptime(date, '%d/%m/%y')
             dates.append(newDate)
 
-            # COLLECT ALL TWEETS
+        # SAVE ALL FOREIGN WORDS IN ORDER TO DELETE THE FORIEGN TWEETS
+        query_string = "SELECT expression.Expression FROM expression where Discriminator=1"
+        result = DBconnect.DBconnect.send_query(query_string)
+        result = tupleToList(result)
+
+        foreign_words = list()
+        for i in result:
+            tmp = ''.join(i)
+            foreign_words.append(tmp)
+
+        lemmatiser = WordNetLemmatizer()
+
+        # COLLECT ALL TWEETS
         tweets = list()
         query_string = "SELECT * FROM tweet"
         result = DBconnect.DBconnect.send_query(query_string)
         result = tupleToList(result)
 
         # SAVE DATES AS A DATETIME TYPE
-        for i in result:
-            tweet = i
+        for tweet in result:
             date = tweet[0]
             date = date.split("/")
             newDate = datetime(int(date[2]), int(date[1]), int(date[0]))
@@ -87,95 +92,91 @@ class CleaningTweetsController:
             tweets.append(tweet)
 
 
-            # SAVE ALL FOREIGN WORDS IN ORDER TO DELETE THE FORIEGN TWEETS
-            query_string = "SELECT expression.Expression FROM expression where Discriminator=1"
-            result = DBconnect.DBconnect.send_query(query_string)
-            result = tupleToList(result)
+            # FOR EACH TWEET WE SPLIT THE TEXT TO WORDS
+            #for tweet in tweets:
 
-            foreign_words = list()
-            for i in result:
+            delete_flag = 0
+            tweet[9] = list()
+            txt = tweet[6]
+            foreign_words_counter = 0
+            txt = txt.split(" ")
+
+            # EACH WORD WE CONVERT TO LOWER CASE AND REMOVE PUNCTUATION.
+            # THEN WE CHECK SOME CONDITIONS:
+            # 1. IF IT IS A FOREIGN WORD WE INCREMENT THE FOREIGN WORD COUNTER
+            #   1.1 IF THIS COUNTER BIGGER THEN TWO WE DELETE THE TWEET FROM DB
+            # 2. IF IT IS ONE OF THE NICK NAMES
+            # 3. IF IT IS AN EMOJI
+
+            for word in txt:
+                word = word.lower()
+                regex = re.compile('[%s]' % re.escape(string.punctuation))
+                word = regex.sub('', word)
+
+                while (len(word) > 0):
+                    if word.find("ud8") == -1 and word.find("u27") == -1:
+                        if word in foreign_words:
+                            foreign_words_counter += 1
+
+                            #IF FORIEGN WORDS COUNTER BIGGER THAN 2 WE DELETE THE TWEET
+                            if foreign_words_counter >= 2:
+                                q = '"'
+                                id = tweet[2]
+                                #print(id)
+                                query_string = "DELETE FROM tweet where TweetID=" + q + id + q
+                                DBconnect.DBconnect.send_query(query_string)
+                                delete_flag = 1
+                                break
+
+                        if word not in nicks:
+                            word = lemmatiser.lemmatize(word, pos="v")
+                        tweet[9].append(word)
+                        word = ""
+
+                    else:
+                        index = word.find("ud8")
+                        if index == -1:
+                            index = word.find("u27")
+                            cnt = word.count("u27")
+                        else:
+                            cnt = word.count("ud8")
+
+                        if index != 0:
+                            left = word[0:index]
+                            emoji = word[index:index + 10]
+                            tweet[9].append(left)
+                            tweet[9].append(emoji)
+                            word = word.replace(left + emoji, "" + "")
+
+                        else:
+                            for i in range(0, cnt):
+                                emoji = word[(index + i*10):(index + i*10) + 10]
+                                tweet[9].append(emoji)
+                            word = ""
+
+#                        else:
+#                            emoji = word[index:index + 10]
+#                            for i in range(0, cnt):
+#                                tweet[9].append(emoji)
+#                            word = word.replace(emoji, "" + "")
+
+                if delete_flag == 1:
+                    delete_flag = 0
+                    foreign_words_counter = 0
+                    tweet[9] = list()
+                    break
+
+            str1 = ""
+            # CONVERT THE LIST OF THE CLEANING WORDS TO STRING AND INSERT TO DB
+            for i in tweet[9]:
                 tmp = i
                 tmp = ''.join(tmp)
-                foreign_words.append(tmp)
+                str1 = str1 + tmp + " "
 
-            lemmatiser = WordNetLemmatizer()
-
-            # FOR EACH TWEET WE SPLIT THE TEXT TO WORDS
-            for tweet in tweets:
-
-                delete_flag = 0
-                tweet[9] = list()
-                txt = tweet[6]
-                foreign_words_counter = 0
-                txt = txt.split(" ")
-
-                # EACH WORD WE CONVERT TO LOWER CASE AND REMOVE PUNCTUATION.
-                # THEN WE CHECK SOME CONDITIONS:
-                # 1. IF IT IS A FOREIGN WORD WE INCREMENT THE FOREIGN WORD COUNTER
-                #   1.1 IF THIS COUNTER BIGGER THEN TWO WE DELETE THE TWEET FROM DB
-                # 2. IF IT IS ONE OF THE NICK NAMES
-                # 3. IF IT IS AN EMOJI
-
-                for word in txt:
-                    word = word.lower()
-                    regex = re.compile('[%s]' % re.escape(string.punctuation))
-                    word = regex.sub('', word)
-
-                    while (len(word) > 0):
-                        if word.find("ud8") == -1 and word.find("u27") == -1:
-                            if word in foreign_words:
-                                foreign_words_counter += 1
-
-                                #IF FORIEGN WORDS COUNTER BIGGER THAN 2 WE DELETE THE TWEET
-                                if foreign_words_counter >=2:
-                                    q = '"'
-                                    id = tweet[2]
-                                    #print(id)
-                                    query_string = "DELETE FROM tweet where TweetID="+ q+id+q
-                                    DBconnect.DBconnect.send_query(query_string)
-                                    delete_flag = 1
-                                    break
-
-                            if word not in nicks:
-                                word = lemmatiser.lemmatize(word, pos="v")
-                            tweet[9].append(word)
-                            word = ""
-                        else:
-                            index = word.find("ud8")
-                            if index == -1:
-                                index = word.find("u27")
-                                cnt = word.count("u27")
-                            else:
-                                cnt = word.count("ud8")
-
-                            if index != 0:
-                                left = word[0:index]
-                                emoji = word[index:index + 10]
-                                tweet[9].append(left)
-                                tweet[9].append(emoji)
-                                word = word.replace(left + emoji, "" + "")
-
-                            else:
-                                emoji = word[index:index + 10]
-                                for i in range(0, cnt):
-                                    tweet[9].append(emoji)
-                                word = word.replace(emoji, "" + "")
-
-                    if delete_flag == 1:
-                        delete_flag = 0
-                        foreign_words_counter = 0
-                        tweet[9] = list()
-                        break
-
-                str1 = ""
-                # CONVERT THE LIST OF THE CLEANING WORDS TO STRING AND INSERT TO DB
-                for i in tweet[9]:
-                    tmp = i
-                    tmp = ''.join(tmp)
-                    str1 = str1 + tmp + " "
-
-                q = '"'
-                id = tweet[2]
-                episodeID = tweet[8]
-                query_string = "update tweet set CleanText = " + q + str1 + q + ", EpisodeID = "+ str(episodeID) + " where TweetID = " + q + id + q
-                DBconnect.DBconnect.send_query(query_string)
+            q = '"'
+            id = tweet[2]
+            episodeID = tweet[8]
+            print(id)
+            #print(str1)
+            query_string = "update tweet set CleanText = " + q + str1 + q + ", EpisodeID = "+ str(episodeID) + " where TweetID = " + q + id + q
+            DBconnect.DBconnect.send_query(query_string)

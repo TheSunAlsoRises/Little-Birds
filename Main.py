@@ -20,9 +20,9 @@ if __name__ == "__main__":
     #ManagerMenuController.ManagerMenuWin(None)
 
     #sys.exit(app.exec_())
-    newList = (1,4,"location","the wall")
-    t = TweetsSummingController.TweetsSummingController(newList)
-    res = TweetsSummingController.TweetsSummingController.tweetSumming(t)
+#    newList = (1,4,"location","the wall")
+ #   t = TweetsSummingController.TweetsSummingController(newList)
+  #  res = TweetsSummingController.TweetsSummingController.tweetSumming(t)
 
 
 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
 #ScriptFilesController.ScriptFilesController.file_to_scriptLines("C://Users\אליה\PycharmProjects\script1.txt",1)
 #ScriptFilesController.ScriptFilesController.file_to_scriptLines("C://Users\אליה\PycharmProjects\script2.txt",2)
 
-#AnalysisController.AnalysisController.analyze_tweets_by_episode()
+    AnalysisController.AnalysisController.analyze_tweets_by_episode()
 
 #emotionsVector = [1,2]
 
