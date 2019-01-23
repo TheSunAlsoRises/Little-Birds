@@ -39,6 +39,7 @@ class GraphUI (QtGui.QDialog):
 
         # Set the window
         self.setStyleSheet("background-color: rgb(255, 255, 255);")
+        #self.window.setGeometry(self.window.x(), self.window.y() , 1000, 200)
 
         # Set the headline
         labelText = ""
@@ -72,6 +73,10 @@ class GraphUI (QtGui.QDialog):
                                         "padding: 0px;"
                                         "font-size: 18px;")
 
+        # Set the graph's size
+        self.canvas.setFixedSize(QtCore.QSize(500, 500))
+        #self.canvas.setMaximumWidth(1200)
+
         # Set the representative tweets
 
         self.tweet1 = QtGui.QLabel(GraphUI.tweetsSum[1] + "\n\n@" + GraphUI.tweetsSum[2])
@@ -94,11 +99,26 @@ class GraphUI (QtGui.QDialog):
 
         # Set the restart and quit buttons
 
-        self.restart_button = QtGui.QPushButton('Restart')
+        #self.restart_button = QtGui.QPushButton('Restart')
+        self.restart_button = QtGui.QPushButton()
         self.restart_button.clicked.connect(GraphUI.window.startMainPageUI)
-        self.quit_button = QtGui.QPushButton('Quit')
-        self.quit_button.clicked.connect(exit)
+        #self.restart_button.setMaximumWidth(91)
+        #self.restart_button.setMaximumHeight(91)
+        self.restart_button.setIcon(QtGui.QIcon(QtGui.QPixmap('C://Users\אליה\PycharmProjects\Little-Birds//buttons\icons8-reboot-filled-100.png')))
 
+        self.restart_button.setFixedSize(QtCore.QSize(90, 90))
+        self.restart_button.setIconSize(QtCore.QSize(80, 80))
+
+        #self.restart_button.setGeometry(self.restart_button.x(), self.restart_button.y(), 91, 91)
+        #self.restart_button.setStyleSheet("background-color: #000000; color: black; border: 4.5px solid #111111; margin: 4px; border-radius: 40px;")
+
+
+        #self.quit_button = QtGui.QPushButton('Quit')
+        self.quit_button = QtGui.QPushButton()
+        self.quit_button.clicked.connect(exit)
+        self.quit_button.setIcon(QtGui.QIcon(QtGui.QPixmap('C://Users\אליה\PycharmProjects\Little-Birds//buttons\icons8-shutdown-100.png')))
+        self.quit_button.setFixedSize(QtCore.QSize(90, 90))
+        self.quit_button.setIconSize(QtCore.QSize(80, 80))
 
         # set the layout
 
@@ -108,6 +128,14 @@ class GraphUI (QtGui.QDialog):
 
         # Set an inner layout for the graph and the tweets
         middle_layout = QtGui.QHBoxLayout()
+
+        # Set an inner-inner layout for the quit button
+        leftbtn_layout = QtGui.QVBoxLayout()
+        leftbtn_layout.addStretch()
+        leftbtn_layout.addWidget(self.quit_button)
+        middle_layout.addLayout(leftbtn_layout)
+
+        middle_layout.addStretch()
 
         # Set an inner-inner layout for the graph and its toolbar
         graph_layout = QtGui.QVBoxLayout()
@@ -121,16 +149,37 @@ class GraphUI (QtGui.QDialog):
         tweets_layout.addWidget(self.tweet2)
         middle_layout.addLayout(tweets_layout)
 
+        middle_layout.addStretch()
+
+        # Set an inner-inner layout for the restart button
+        rightbtn_layout = QtGui.QVBoxLayout()
+        rightbtn_layout.addStretch()
+        rightbtn_layout.addWidget(self.restart_button)
+        middle_layout.addLayout(rightbtn_layout)
+
         layout.addLayout(middle_layout)
 
         # Set an inner layout for the buttons
-        down_layout = QtGui.QHBoxLayout()
-        down_layout.addWidget(self.quit_button)
-        down_layout.addStretch()
-        down_layout.addWidget(self.restart_button)
-        layout.addLayout(down_layout)
+        #down_layout = QtGui.QHBoxLayout()
+        #down_layout.addWidget(self.quit_button)
+        #down_layout.addStretch()
+        #down_layout.addWidget(self.restart_button)
+        #layout.addLayout(down_layout)
 
         self.setLayout(layout)
+
+        # Clean the chosen parameters for the next round
+        self.window.parameters = None
+        self.window.episode = None
+        self.window.episode_text = None
+        self.window.category = None
+        self.window.character = None
+        self.window.character_text = None
+        self.window.location = None
+        self.window.location_text = None
+        self.window.house = None
+
+        # Show graph
         self.plot()
 
     def plot(self):
@@ -199,7 +248,7 @@ class GraphUI (QtGui.QDialog):
         ax.fill(angles, values, 'r', alpha=0.1)
 
         # Add legend
-        plt.legend(loc='upper right', bbox_to_anchor=(0.05, 0.05))
+        plt.legend(loc='upper right', bbox_to_anchor=(0.15, 0.05))
 
         # create an axis
         #ax = self.figure.add_subplot(111)

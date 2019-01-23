@@ -1,6 +1,6 @@
 import sys, os
 import MainPage, Login, ManagerMenu, Graph, UploadFrame, FileUploadDandD, Episode_UI, Category, Character, Location, House, ErrorMessage
-import ScriptFilesController, DBconnect, CleaningTweetsController, AnalysisController, TweetsSummingController
+import ScriptFilesController, DBconnect, CleaningTweetsController, AnalysisController, TweetsSummingController, LoginController
 import ScriptlinesSummingController
 from PyQt4.QtGui import QApplication, QMainWindow, QPushButton, QWidget, QMessageBox
 from PyQt4 import QtGui, QtCore
@@ -20,7 +20,9 @@ class TweetsThread(QThread):
 
     def run(self):
         #  Truncate all the existing tweets
-        DBconnect.DBconnect.send_query("truncate table littlebirds.tweet")
+        # leave it out for now so we can add the files one by one
+        # TODO:
+#        DBconnect.DBconnect.send_query("truncate table littlebirds.tweet")
         # Call function to upload the tweets
         for url in self.urls:
             DBconnect.DBconnect.upload_tweets_file(url)
@@ -179,7 +181,10 @@ class MainWindow(QMainWindow):
     uploadTweetsStatus = 0
 
     # Paths to files that the manager uploads
-    urlsList = list()
+    urlsList = None
+
+    # Current user details
+    username = ""
 
     # Selection parameters
     parameters = None
@@ -195,7 +200,7 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
 
-        self.setFixedSize(400, 350)
+        self.setFixedSize(891, 541)
         #self.adjustSize()
 
         # Center the window in the screen
@@ -206,25 +211,27 @@ class MainWindow(QMainWindow):
         #self.setGeometry(400,50,50,0)
 
         self.startMainPageUI()
-        #self.startErrorMessageUI()
-        #self.startUploadUI()
-        #self.startGraphUI()
 
     def startMainPageUI(self):
         self.Window = MainPageUI(self)
         self.setWindowTitle("Main Page")
         self.setCentralWidget(self.Window)
         # self.Window.CPSBTN.clicked.connect(self.startManagerMenuUI)
-    # if not logged in:
-        self.Window.ui.manager_area_button.clicked.connect(self.startLoginUI)
-        self.Window.ui.start_button.clicked.connect(self.startEpisodeUI)
-    #else:
-        #self.Window.ui.manager_area_button.clicked.connect(self.startManagerMenuUI)
-        # Show Graph:
-        #self.Window.ui.manager_area_button.clicked.connect(self.startGraphUI)
-        #self.ui = Login.Ui_Form()
 
-        # Give the graph a referance
+
+
+        self.restart_button = QtGui.QPushButton('Restart')
+
+
+
+        login_status = LoginController.LoginController.isLoggedIn(self.username)
+        if login_status == -1:
+            self.Window.ui.manager_area_button.clicked.connect(self.startLoginUI)
+            self.Window.ui.start_button.clicked.connect(self.startEpisodeUI)
+        elif login_status == 1:
+            self.Window.ui.manager_area_button.clicked.connect(self.startManagerMenuUI)
+
+        # Give the graph a reference
         Graph.GraphUI.window = self
 
         self.show()
@@ -368,6 +375,8 @@ class MainWindow(QMainWindow):
             self.startCategoryUI()
 
     def startHouseUI(self):
+        self.flag = 0
+
         self.Window = HouseUI(self)
         self.setWindowTitle("Little Birds")
         self.setCentralWidget(self.Window)
@@ -459,23 +468,42 @@ class MainWindow(QMainWindow):
         self.Window = LoginUI(self)
         self.setWindowTitle("Login")
         self.setCentralWidget(self.Window)
-        # self.Window.CPSBTN.clicked.connect(self.startManagerMenuUI)
-        self.Window.ui.next_button.clicked.connect(self.startManagerMenuUI)
+        self.Window.ui.next_button.clicked.connect(self.login)
         self.Window.ui.back_button.clicked.connect(self.startMainPageUI)
-        # self.ui = Login.Ui_Form()
         self.show()
+
+    def login(self):
+        login_result = LoginController.LoginController.login(self.Window.ui.username_input.toPlainText(),
+                                                             self.Window.ui.password_input.toPlainText())
+        if login_result[0] == 1:
+            self.username = login_result[1]
+            self.startManagerMenuUI()
+
+        elif login_result[0] == -1:
+            text = "  Failed to login\n" \
+                   "  Please check your input and try again       "
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setText(text)
+            msg.setWindowTitle("Error")
+            msg.setStandardButtons(QMessageBox.Ok)
+            retval = msg.exec_()
+            return msg
 
     def startManagerMenuUI(self):
         self.Window = ManagerMenuUI(self)
         self.setWindowTitle("Manager Menu")
         self.setCentralWidget(self.Window)
-        #self.Window.CPSBTN.clicked.connect(self.startLoginUI)
         self.Window.ui.back_button.clicked.connect(self.startMainPageUI)
-        #TODO: self.Window.ui.logout_button.clicked.connect(Logout method, and then call self.startMainPageUI)
-        self.Window.ui.logout_button.clicked.connect(self.startMainPageUI)
+        self.Window.ui.logout_button.clicked.connect(self.logout)
         self.Window.ui.upload_data_button.clicked.connect(self.uploadTweets)
-        #self.Window.ui.upload_scripts_button.clicked.connect(self.uploadScripts)
         self.show()
+
+    def logout(self):
+        self.username = ""
+        pass
+
+        self.startMainPageUI()
 
     def uploadScripts(self):
         self.uploadTweetsStatus = 0
@@ -496,11 +524,19 @@ class MainWindow(QMainWindow):
         #self.ui = UploadFrame.Ui_Form()
         #self.ui.setupUi(self)
         if self.uploadScriptsStatus == 1:
+            # Scripts:
             # Disable Back option
             self.Window.ui.back_button.setDisabled(True)
+            # Set proper headline
+            self.Window.ui.headline.setText("Drop the script files below")
         else:
+            # Tweets:
             self.Window.ui.back_button.clicked.connect(self.upload_canceled)
+            self.Window.ui.headline.setText("Drop the tweets files below")
         self.Window.ui.upload_button.clicked.connect(self.upload_requested)
+        self.Window.ui.uploading_message.setText("")
+        # Initialize an empty list
+        self.urlsList = list()
         self.show()
 
     def fileDropped(self, l):
@@ -512,7 +548,30 @@ class MainWindow(QMainWindow):
                 #icon = QtGui.QIcon(url)
                 #pixmap = icon.pixmap(72, 72)
                 #icon = QtGui.QIcon(pixmap)
-                item = QtGui.QListWidgetItem(url, self.Window)
+
+                #self.Window.ui.filesList.move(241, 221)
+                #self.Window.ui.filesList.setMaximumHeight(17 * 4)
+                #self.Window.ui.filesList.setMaximumWidth(411)
+
+                # hererererere
+                #self.Window.ui.filesList.setGeometry(240, 360, 410, 85)
+
+                #self.Window.ui.filesList.setStyleSheet("    ")
+
+                # writes on the window itself, covered by the labels...
+                item = QtGui.QListWidgetItem(url, self.Window.ui.filesList)
+
+                # item = QtGui.QLabel(url)
+                # #item.move(221,241)
+                # item.move(500,500)
+                # item.setMaximumWidth(411)
+                # item.setMaximumHeight(211)
+                # item.setStyleSheet("background-color: rgb(29, 202, 255);"
+                #                           "color: rgb(200, 100, 100);"
+                #                           "margin-top: 15px; margin-bottom: 5px; margin-right: 15px; margin-left: 15px;"
+                #                           "padding: 15px;"
+                #                           "font-size: 18px;")
+
                 #item.setIcon(icon)
                 #item.setStatusTip(url)
 
@@ -530,7 +589,7 @@ class MainWindow(QMainWindow):
             # Disable Back option
             self.Window.ui.back_button.setDisabled(True)
             # Show process message
-            item = QtGui.QListWidgetItem("\n\n\nUploading, please wait . . .", self.Window)
+            self.Window.ui.uploading_message.setText("Uploading, please wait . . .")
 
             #thread_args = tuple()
             #thread_args.__add__(tuple(self.urlsList))

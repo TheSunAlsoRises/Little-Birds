@@ -1,5 +1,5 @@
 import sys
-import Login, ManagerMenu, MainPage
+import LoginController, ManagerMenu, MainPage
 import ManagerUIsController
 from PyQt4 import QtCore, QtGui
 

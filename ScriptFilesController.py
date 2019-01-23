@@ -61,7 +61,7 @@ class ScriptFilesController:
                         if words[1].index(":") + 1 == len(words[1]) \
                                 and words[1] != "to:":                          # (Option 2: full name stated)
                                                                                 # (and it's not "cut to:" location line)
-                            #for i in range(0, len(words[0]) - 1):       # Save speaker name
+                            # for i in range(0, len(words[0]) - 1):       # Save speaker name
                             #   speaker += words[0][i]
                             speaker += words[0] + " " + words[1]
                             speaker = speaker[:-1]
@@ -97,7 +97,7 @@ class ScriptFilesController:
                 clean_text = ""
                 for i in range(0, len(words)):
                     # Remove punctuation
-                    words[i] = re.sub('['+string.punctuation+']', '',words[i])
+                    words[i] = re.sub('[' + string.punctuation + ']', '', words[i])
                     if words[i] in nicks:
                         # Simply add the words with a meaning in the series
                         clean_text += words[i]
@@ -135,5 +135,6 @@ class ScriptFilesController:
                 print(lines_counter)
 
         # May not be necessary now that we get the amount straigh from the DB (see in class file)
-        #ScriptLine.ScriptLine.static_lines_counter += lines_counter         # Update the global number of script-lines
+        # Update the global number of script-lines
+        # ScriptLine.ScriptLine.static_lines_counter += lines_counter
         file.close()

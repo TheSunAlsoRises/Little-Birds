@@ -152,12 +152,16 @@ class ScriptlinesSummingController:
                        + q + str(self.representive_scriptline_ID1) + q
         result = tupleToList(DBconnect.DBconnect.send_query(query_string))
 
+        # Perhaps:
+        # if len(result[0]) > 0:
         self.scriptlineText1 = result[0][0]
 
         query_string = "SELECT Text FROM scriptline WHERE LineID like " \
                        + q + str(self.representive_scriptline_ID2) + q
         result = tupleToList(DBconnect.DBconnect.send_query(query_string))
 
+        # Perhaps:
+        #if len(result[0]) > 0:
         self.scriptlineText2 = result[0][0]
 
         print("\n\nsummed scriptlines: " + str(self.summed_scriptlines_counter) + "\n\n")

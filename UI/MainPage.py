@@ -25,29 +25,116 @@ except AttributeError:
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName(_fromUtf8("Form"))
-        Form.resize(400, 309)
-        self.secondary_headline = QtGui.QLabel(Form)
-        self.secondary_headline.setGeometry(QtCore.QRect(60, 110, 261, 41))
-        self.secondary_headline.setAlignment(QtCore.Qt.AlignCenter)
-        self.secondary_headline.setObjectName(_fromUtf8("secondary_headline"))
-        self.headline = QtGui.QLabel(Form)
-        self.headline.setGeometry(QtCore.QRect(40, 20, 319, 121))
-        self.headline.setAlignment(QtCore.Qt.AlignCenter)
-        self.headline.setObjectName(_fromUtf8("headline"))
+        Form.resize(891, 541)
+        self.label = QtGui.QLabel(Form)
+        self.label.setGeometry(QtCore.QRect(-120, 80, 531, 81))
+        self.label.setBaseSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setPointSize(-1)
+        self.label.setFont(font)
+        self.label.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.label.setAutoFillBackground(False)
+        self.label.setStyleSheet(_fromUtf8("background-color:  rgb(0, 0, 0);\n"
+"color: rgb(240, 240, 240);\n"
+"font-size:50px;"))
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        self.label.setObjectName(_fromUtf8("label"))
+        self.label_2 = QtGui.QLabel(Form)
+        self.label_2.setGeometry(QtCore.QRect(-150, 0, 1051, 541))
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("Times New Roman"))
+        font.setPointSize(48)
+        font.setBold(False)
+        font.setWeight(50)
+        font.setKerning(False)
+        self.label_2.setFont(font)
+        self.label_2.setToolTip(_fromUtf8(""))
+        self.label_2.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.label_2.setText(_fromUtf8(""))
+        self.label_2.setPixmap(QtGui.QPixmap(_fromUtf8("../pictures/craw.jpg")))
+        self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.label_3 = QtGui.QLabel(Form)
+        self.label_3.setGeometry(QtCore.QRect(-70, 160, 421, 51))
+        self.label_3.setBaseSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setPointSize(18)
+        font.setBold(False)
+        font.setWeight(50)
+        self.label_3.setFont(font)
+        self.label_3.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.label_3.setAutoFillBackground(False)
+        self.label_3.setStyleSheet(_fromUtf8("background-color: rgb(0, 172, 237)"))
+        self.label_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_3.setObjectName(_fromUtf8("label_3"))
+        self.label_4 = QtGui.QLabel(Form)
+        self.label_4.setGeometry(QtCore.QRect(0, 200, 351, 51))
+        self.label_4.setBaseSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setPointSize(18)
+        font.setBold(False)
+        font.setWeight(50)
+        self.label_4.setFont(font)
+        self.label_4.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.label_4.setAutoFillBackground(False)
+        self.label_4.setStyleSheet(_fromUtf8("background-color: rgb(0, 172, 237)"))
+        self.label_4.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_4.setObjectName(_fromUtf8("label_4"))
         self.start_button = QtGui.QPushButton(Form)
-        self.start_button.setGeometry(QtCore.QRect(110, 200, 171, 41))
+        self.start_button.setGeometry(QtCore.QRect(90, 330, 171, 71))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        font.setWeight(75)
+        self.start_button.setFont(font)
+        self.start_button.setStyleSheet(_fromUtf8("QPushButton:hover\n"
+"{\n"
+"  background-color: #111111;\n"
+"  color: white;\n"
+"}\n"
+"\n"
+"QPushButton\n"
+"{ \n"
+"background-color: 000000;\n"
+"  color: black;\n"
+"  border: 6px solid #00aced;\n"
+"margin: 3px;\n"
+"}"))
         self.start_button.setObjectName(_fromUtf8("start_button"))
         self.manager_area_button = QtGui.QPushButton(Form)
-        self.manager_area_button.setGeometry(QtCore.QRect(150, 260, 91, 23))
+        self.manager_area_button.setGeometry(QtCore.QRect(120, 420, 111, 31))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.manager_area_button.setFont(font)
+        self.manager_area_button.setStyleSheet(_fromUtf8("QPushButton:hover\n"
+"{\n"
+"  background-color: #111111;\n"
+"  color: white;\n"
+"}\n"
+"\n"
+"QPushButton\n"
+"{ \n"
+"background-color: 000000;\n"
+"  color: black;\n"
+"  border: 3px solid #00aced;\n"
+"}"))
         self.manager_area_button.setObjectName(_fromUtf8("manager_area_button"))
+        self.label_2.raise_()
+        self.label.raise_()
+        self.label_3.raise_()
+        self.label_4.raise_()
+        self.start_button.raise_()
+        self.manager_area_button.raise_()
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(_translate("Form", "Form", None))
-        self.secondary_headline.setText(_translate("Form", "What Twitter feels about #Game_of_Thrones", None))
-        self.headline.setText(_translate("Form", "Little Birds", None))
+        self.label.setText(_translate("Form", "Little Birds", None))
+        self.label_3.setText(_translate("Form", "What Twitter Feels ", None))
+        self.label_4.setText(_translate("Form", "About #Game_of_Thrones", None))
         self.start_button.setText(_translate("Form", "Start", None))
         self.manager_area_button.setText(_translate("Form", "Manager area", None))
 

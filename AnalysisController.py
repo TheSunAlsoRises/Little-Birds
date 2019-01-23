@@ -47,11 +47,10 @@ class AnalysisController:
 
         # Get the tweets of each episode from the DB
         for episode in episodes:
-            #result = DBconnect.DBconnect.tuple_to_list\
-            #    ("SELECT * FROM littlebirds.tweet WHERE littlebirds.tweet.EpisodeID = " + "1")
-            # TODO: replace with:
+            # Take only the new tweets in the db that belong to the right episode
             result = DBconnect.DBconnect.tuple_to_list\
-             ("SELECT * FROM littlebirds.tweet WHERE littlebirds.tweet.EpisodeID = " + str(episode.episodeID))
+             ("SELECT * FROM littlebirds.tweet WHERE littlebirds.tweet.EpisodeID = "
+              + str(episode.episodeID) + " and EmotionsVec is null")
 
             # Analyze the tweets of each episode
             tweets_of_episode = list()
@@ -300,11 +299,11 @@ class AnalysisController:
 
         # Get the tweets of each episode from the DB
         for script in scripts:
-            # result = DBconnect.DBconnect.tuple_to_list \
-            #     ("SELECT * FROM littlebirds.scriptline WHERE littlebirds.scriptline.ScriptID = " + "1")
-            # Use instead:
+
             result = DBconnect.DBconnect.tuple_to_list\
-            ("SELECT * FROM littlebirds.scriptline WHERE littlebirds.scriptline.ScriptID = " + str(script.scriptID))
+            ("SELECT * FROM littlebirds.scriptline WHERE littlebirds.scriptline.ScriptID = "
+             + str(script.scriptID) + " and EmotionsVec is null")
+
 
             # Analyze the tweets of each episode
             scriptlines_of_script = list()

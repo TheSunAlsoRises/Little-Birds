@@ -67,7 +67,8 @@ class CleaningTweetsController:
 
         # COLLECT ALL TWEETS
         tweets = list()
-        query_string = "SELECT * FROM tweet"
+        # Take only the new tweets
+        query_string = "SELECT * FROM tweet where EmotionsVec is null"
         result = DBconnect.DBconnect.send_query(query_string)
         result = tupleToList(result)
 
