@@ -47,12 +47,14 @@ class TweetsSummingController:
                     nicks.append(tmp)
                 character_nicks = nicks
 
-                allNicksQuery = "SELECT * FROM littlebirds.tweet WHERE EpisodeID = " + str(self.requested_episode) + " AND " \
+                allNicksQuery = "SELECT * FROM littlebirds.tweet WHERE EpisodeID = " + str(self.requested_episode) + " AND (" \
                                 "CleanText like " + q + "%" + str(name) + "%" + q
                 for nick in character_nicks:
                     if str(nick) == "ned" or str(nick) == "sam":
                         nick = " " + str(nick) + " "
-                    allNicksQuery += " or CleanText like " + q + "%" + str(nick) + "%" + q
+                    allNicksQuery += " OR CleanText like " + q + "%" + str(nick) + "%" + q
+                # Close the right argument to 'AND'
+                allNicksQuery += ")"
 
                 result = DBconnect.DBconnect.send_query(allNicksQuery)
                 tweets = tupleToList(result)
@@ -97,7 +99,7 @@ class TweetsSummingController:
 
             house = self.selected
                                 # Houses names are rare in other meanings, so no need in spaces before and after
-            allCharactersQuery = "SELECT * FROM littlebirds.tweet WHERE EpisodeID = " + str(self.requested_episode) + " AND " \
+            allCharactersQuery = "SELECT * FROM littlebirds.tweet WHERE EpisodeID = " + str(self.requested_episode) + " AND (" \
                                  "CleanText like " + q + "%" + str(house) + "%" + q
 
             for character in characters_house:
@@ -124,6 +126,9 @@ class TweetsSummingController:
                     if str(nick) == "ned" or str(nick) == "sam":
                         nick = " " + str(nick) + " "
                     allCharactersQuery += " or CleanText like " + q + "%" + str(nick) + "%" + q
+
+            # Close the right argument to 'AND'
+            allCharactersQuery += ")"
 
             result = DBconnect.DBconnect.send_query(allCharactersQuery)
             tweets = tupleToList(result)
@@ -169,10 +174,12 @@ class TweetsSummingController:
                     nicks.append(tmp)
                 location_nicks = nicks
 
-                allNicksQuery = "SELECT * FROM littlebirds.tweet WHERE EpisodeID = " + str(self.requested_episode) + " AND " \
+                allNicksQuery = "SELECT * FROM littlebirds.tweet WHERE EpisodeID = " + str(self.requested_episode) + " AND (" \
                                               "CleanText like " + q + "%" + str(location) + "%" + q
                 for nick in location_nicks:
                     allNicksQuery += " or CleanText like " + q + "%" + str(nick) + "%" + q
+                # Close the right argument to 'AND'
+                allNicksQuery += ")"
 
                 result = DBconnect.DBconnect.send_query(allNicksQuery)
                 tweets = tupleToList(result)
@@ -203,18 +210,29 @@ class TweetsSummingController:
                        + q + str(self.representive_tweet_ID1) + q
         result = tupleToList(DBconnect.DBconnect.send_query(query_string))
 
-        self.tweetText1 = result[0][0]
-        self.author1 = result[0][1]
+        try:
+            self.tweetText1 = result[0][0]
+            self.author1 = result[0][1]
+        except IndexError:
+            self.tweetText1 = ""
+            self.author1 = ""
 
         query_string = "SELECT OriginalText, UserName FROM tweet WHERE TweetID like " \
                        + q + str(self.representive_tweet_ID2) + q
         result = tupleToList(DBconnect.DBconnect.send_query(query_string))
 
-        self.tweetText2 = result[0][0]
-        self.author2 = result[0][1]
+        try:
+            self.tweetText2 = result[0][0]
+            self.author2 = result[0][1]
+        except IndexError:
+            self.tweetText2 = ""
+            self.author2 = ""
 
         print("\n\nsummed tweets: " + str(self.summed_tweets_counter) + "\n\n")
-        return [self.total_vector, self.tweetText1, self.author1, self.tweetText2, self.author2, self.summed_tweets_counter]
+        if self.summed_tweets_counter == 0:
+            return None
+        else:
+            return [self.total_vector, self.tweetText1, self.author1, self.tweetText2, self.author2, self.summed_tweets_counter]
 
 
     def locateRepresentativeTweetsProcedure(self, tweet):
