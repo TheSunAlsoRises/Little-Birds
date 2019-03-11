@@ -45,12 +45,14 @@ class ScriptlinesSummingController:
                     nicks.append(tmp)
                 character_nicks = nicks
 
-                allNicksQuery = "SELECT * FROM littlebirds.scriptline WHERE ScriptID = " + str(self.requested_episode) + " AND " \
+                allNicksQuery = "SELECT * FROM littlebirds.scriptline WHERE ScriptID = " + str(self.requested_episode) + " AND (" \
                                 "CleanText like " + q + "%" + str(name) + "%" + q
                 for nick in character_nicks:
                     if str(nick) == "ned" or str(nick) == "sam":
                         nick = " " + str(nick) + " "
                     allNicksQuery += " or CleanText like " + q + "%" + str(nick) + "%" + q
+                # Close the right argument to 'AND'
+                allNicksQuery += ")"
 
                 result = DBconnect.DBconnect.send_query(allNicksQuery)
                 scriptlines = tupleToList(result)
@@ -79,7 +81,7 @@ class ScriptlinesSummingController:
 
             house = self.selected
                                 # Houses names are rare in other meanings, so no need in spaces before and after
-            allCharactersQuery = "SELECT * FROM littlebirds.scriptline WHERE ScriptID = " + str(self.requested_episode) + " AND " \
+            allCharactersQuery = "SELECT * FROM littlebirds.scriptline WHERE ScriptID = " + str(self.requested_episode) + " AND (" \
                                  "CleanText like " + q + "%" + str(house) + "%" + q
 
             for character in characters_house:
@@ -106,6 +108,9 @@ class ScriptlinesSummingController:
                     if str(nick) == "ned" or str(nick) == "sam":
                         nick = " " + str(nick) + " "
                     allCharactersQuery += " or CleanText like " + q + "%" + str(nick) + "%" + q
+
+            # Close the right argument to 'AND'
+            allCharactersQuery += ")"
 
             result = DBconnect.DBconnect.send_query(allCharactersQuery)
             scriptlines = tupleToList(result)
@@ -134,10 +139,12 @@ class ScriptlinesSummingController:
                     nicks.append(tmp)
                 location_nicks = nicks
 
-                allNicksQuery = "SELECT * FROM littlebirds.scriptline WHERE ScriptID = " + str(self.requested_episode) + " AND " \
+                allNicksQuery = "SELECT * FROM littlebirds.scriptline WHERE ScriptID = " + str(self.requested_episode) + " AND (" \
                                               "CleanText like " + q + "%" + str(location) + "%" + q
                 for nick in location_nicks:
                     allNicksQuery += " or CleanText like " + q + "%" + str(nick) + "%" + q
+                # Close the right argument to 'AND'
+                allNicksQuery += ")"
 
                 result = DBconnect.DBconnect.send_query(allNicksQuery)
                 scriptlines = tupleToList(result)
@@ -152,16 +159,25 @@ class ScriptlinesSummingController:
                        + q + str(self.representive_scriptline_ID1) + q
         result = tupleToList(DBconnect.DBconnect.send_query(query_string))
 
-        self.scriptlineText1 = result[0][0]
+        try:
+            self.scriptlineText1 = result[0][0]
+        except IndexError:
+            self.scriptlineText1 = ""
 
         query_string = "SELECT Text FROM scriptline WHERE LineID like " \
                        + q + str(self.representive_scriptline_ID2) + q
         result = tupleToList(DBconnect.DBconnect.send_query(query_string))
 
-        self.scriptlineText2 = result[0][0]
+        try:
+            self.scriptlineText2 = result[0][0]
+        except IndexError:
+            self.scriptlineText2 = ""
 
         print("\n\nsummed scriptlines: " + str(self.summed_scriptlines_counter) + "\n\n")
-        return [self.total_vector, self.scriptlineText1, self.scriptlineText2, self.summed_scriptlines_counter]
+        if self.summed_scriptlines_counter == 0:
+            return None
+        else:
+            return [self.total_vector, self.scriptlineText1, self.scriptlineText2, self.summed_scriptlines_counter]
 
     def addVector(self, scriptline):
 
