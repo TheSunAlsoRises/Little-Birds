@@ -12,7 +12,7 @@ from PyQt4.QtCore import QThread, SIGNAL
 class TweetsThread(QThread):
 
     def __init__(self, urls):
-        QThread.__init__(self)
+        QThread.__init__(self).__init__(self)
         self.urls = urls
 
     def __del__(self):
@@ -239,8 +239,7 @@ class MainWindow(QMainWindow):
         self.Window = EpisodeUI(self)
         self.setWindowTitle("Little Birds")
         self.setCentralWidget(self.Window)
-        #self.Window.ui.label.setStyleSheet("background-image: url(./pictures/winter1.jpeg);")
-        self.Window.ui.label.setStyleSheet("background-image: url(:buttons/winter1.jpeg);")
+        self.Window.ui.label.setStyleSheet("background-image: url(./pictures/winter1.jpeg);")
         self.Window.ui.next_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/tran_right.png')))
         self.Window.ui.back_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/icons8-reply-arrow-100.png')))
         self.Window.ui.next_button.clicked.connect(lambda:self.saveEpisodeSelection("next"))
@@ -646,7 +645,7 @@ class MainWindow(QMainWindow):
                     return
 
             # Show process message
-            item = QtGui.QListWidgetItem("\n\n\nUploading, please wait . . .", self.Window)
+            self.Window.ui.uploading_message.setText("Uploading, please wait . . .")
 
             self.thready_palavra = ScriptsThread(self.urlsList)
             self.connect(self.thready_palavra, SIGNAL("finished()"), self.done)
