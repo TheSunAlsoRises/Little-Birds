@@ -210,7 +210,7 @@ class TweetsSummingController:
                 print("not in DB!")
 
 
-        Prediction.prediction(tweets)
+        #Prediction.prediction(tweets)
 
         query_string = "SELECT OriginalText, UserName FROM tweet WHERE TweetID like "\
                        + q + str(self.representive_tweet_ID1) + q

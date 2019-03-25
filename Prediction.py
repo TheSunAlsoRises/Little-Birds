@@ -75,7 +75,7 @@ def Linear_reggression():
 
         best_t = 1
         best_error = 11111111111111111111111111111
-        for T in range(2,10):
+        for T in range(2,15):
             names = []
             for i in range(1, datasetsize[1]-1):  # all col without first and last
                 r = dataset.iloc[0:, i].values
@@ -100,11 +100,10 @@ def Linear_reggression():
 
             # Predicting the Test set result
             y_pred = regressor.predict(x_test)
+
             #print('Coefficients: \n', regressor.coef_)
-            print("T : ",T)
-            # The mean squared error
+
             x = mean_squared_error(y_test, y_pred)
-            print("Mean squared error: %.4f" %x)
             if(x<best_error):
                 best_t = T
                 best_error = x
@@ -115,7 +114,10 @@ def Linear_reggression():
         #print("The value of y_test for emotion " + e + " is:" + str(sum(y_test)/len(y_test)))
         print("The sum of y_test for emotion " + e + " is:" + str(sum(y_test)))
         #results.append(sum(y_pred)/len(y_pred))
-        results.append(sum(y_pred))
+        if sum(y_pred)>0 :
+            results.append(sum(y_pred))
+        else:
+            results.append(0)
 
     return results
 
