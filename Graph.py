@@ -17,6 +17,8 @@ class GraphUI (QtGui.QDialog):
     window = None
     tweetsSum = None
     scriptsSum = None
+    prediction = None
+    prediction_size = None
 
     def __init__(self, parent=None):
         super(GraphUI, self).__init__(parent)
@@ -48,6 +50,11 @@ class GraphUI (QtGui.QDialog):
             GraphUI.scriptsSum[0] = list()
             for i in range(0, 8):
                 GraphUI.scriptsSum[0].insert(i, 0)
+
+        if GraphUI.prediction is None:
+            GraphUI.prediction = list()
+            for i in range(0, 8):
+                GraphUI.prediction.insert(i, 0)
 
         if GraphUI.tweetsSum is None:
             GraphUI.tweetsSum = list()
@@ -87,8 +94,10 @@ class GraphUI (QtGui.QDialog):
                                  "font-size: 35px;")
 
         # Set secondary headline
-        self.second_label = QtGui.QLabel("Produced from " + str(GraphUI.tweetsSum[5]) + " tweets and "
-                                         + str(GraphUI.scriptsSum[3]) + " script lines")
+        self.second_label = QtGui.QLabel("Produced from " + str(GraphUI.tweetsSum[5]) + " tweets, "
+                                         + str(GraphUI.scriptsSum[3]) + " script lines, " +
+                                         str(round(0.8*GraphUI.prediction_size)) + " for training set and " +
+                                         str(round(0.2*GraphUI.prediction_size)) + " for testing set")
         self.second_label.setAlignment(QtCore.Qt.AlignCenter)
         self.second_label.setStyleSheet("background-color: rgb(255, 255, 255);"
                                         "color: rgb(0, 0, 0);"
@@ -212,15 +221,15 @@ class GraphUI (QtGui.QDialog):
     def plot(self):
         # Set data
         df = pd.DataFrame({
-            'group': ['Tweets', 'Scripts'],
-            'Joy': [GraphUI.tweetsSum[0][5], GraphUI.scriptsSum[0][5]],
-            'Trust': [GraphUI.tweetsSum[0][7], GraphUI.scriptsSum[0][7]],
-            'Fear': [GraphUI.tweetsSum[0][2], GraphUI.scriptsSum[0][2]],
-            'Surprise': [GraphUI.tweetsSum[0][4], GraphUI.scriptsSum[0][4]],
-            'Sadness': [GraphUI.tweetsSum[0][3], GraphUI.scriptsSum[0][3]],
-            'Disgust': [GraphUI.tweetsSum[0][1], GraphUI.scriptsSum[0][1]],
-            'Anger': [GraphUI.tweetsSum[0][0], GraphUI.scriptsSum[0][0]],
-            'Anticipation': [GraphUI.tweetsSum[0][6], GraphUI.scriptsSum[0][6]]
+            'group': ['Tweets', 'Scripts','Prediction'],
+            'Joy': [GraphUI.tweetsSum[0][5], GraphUI.scriptsSum[0][5], GraphUI.prediction[5]],
+            'Trust': [GraphUI.tweetsSum[0][7], GraphUI.scriptsSum[0][7], GraphUI.prediction[7]],
+            'Fear': [GraphUI.tweetsSum[0][2], GraphUI.scriptsSum[0][2], GraphUI.prediction[2]],
+            'Surprise': [GraphUI.tweetsSum[0][4], GraphUI.scriptsSum[0][4], GraphUI.prediction[4]],
+            'Sadness': [GraphUI.tweetsSum[0][3], GraphUI.scriptsSum[0][3], GraphUI.prediction[3]],
+            'Disgust': [GraphUI.tweetsSum[0][1], GraphUI.scriptsSum[0][1], GraphUI.prediction[1]],
+            'Anger': [GraphUI.tweetsSum[0][0], GraphUI.scriptsSum[0][0], GraphUI.prediction[0]],
+            'Anticipation': [GraphUI.tweetsSum[0][6], GraphUI.scriptsSum[0][6], GraphUI.prediction[6]]
         })
 
         #initialize the figure
@@ -273,6 +282,12 @@ class GraphUI (QtGui.QDialog):
         values += values[:1]
         ax.plot(angles, values, linewidth=1, linestyle='solid', label="Scripts")
         ax.fill(angles, values, 'r', alpha=0.1)
+
+        # Ind3
+        values = df.loc[2].drop('group').values.flatten().tolist()
+        values += values[:1]
+        ax.plot(angles, values, linewidth=1, linestyle='solid', label="Prediction")
+        ax.fill(angles, values, 'g', alpha=0.1)
 
         # Add legend
         plt.legend(loc='upper right', bbox_to_anchor=(0.15, 0.05))

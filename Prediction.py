@@ -12,9 +12,16 @@ def tupleToList(t):
         emptyList.append(list(t[i]))
     return emptyList
 
-def Preprocessing_data():
-    #Create dictionary
+def Preprocessing_data(set_of_tweets):
 
+    # Not enough data
+    if len(set_of_tweets) < 500:
+        return None
+    # Too much data, take only the first 7000
+    if len(set_of_tweets)> 1000:
+        set_of_tweets = set_of_tweets[:1000]
+
+    #Create dictionary
     emotions = ["Anger", "Disgust", "Fear", "Sadness", "Surprise", "Joy", "Anticipation", "Trust"]
     for e in emotions:
         query_string = "SELECT Word FROM word WHERE " + e + ">0"
@@ -31,13 +38,13 @@ def Preprocessing_data():
             csv_writer.writerow(dict)
 
         #Collect all CleanText of tweet
-        query_string = "SELECT CleanText,EmotionsVec FROM tweet limit 0,1000;"
-        result = DBconnect.DBconnect.send_query(query_string)
-        tweets = tupleToList(result)
+        #query_string = "SELECT CleanText,EmotionsVec FROM tweet limit 0,1000;"
+        #result = DBconnect.DBconnect.send_query(query_string)
+        #tweets = tupleToList(result)
 
-        for tweet in tweets:
-            text = tweet[0]
-            emotion_vector = tweet[1].split(" ")
+        for tweet in set_of_tweets:
+            text = tweet[12]
+            emotion_vector = tweet[10].split(" ")
             tweet_array = [0]*len(dict)
             tweet_array[0] = text
 
@@ -55,10 +62,12 @@ def Preprocessing_data():
             with open(e+'.csv', 'a') as f:
                 csv_writer = csv.writer(f)
                 csv_writer.writerow(tweet_array)
-
+    return 1
 
 def Linear_reggression():
     emotions = ["Anger", "Disgust", "Fear", "Sadness", "Surprise", "Joy", "Anticipation", "Trust"]
+    results = []
+
     for e in emotions:
         print("\nEmotion :", e)
         dataset = pd.read_csv(e+'.csv')
@@ -66,7 +75,7 @@ def Linear_reggression():
 
         best_t = 1
         best_error = 11111111111111111111111111111
-        for T in range(2,7):
+        for T in range(2,10):
             names = []
             for i in range(1, datasetsize[1]-1):  # all col without first and last
                 r = dataset.iloc[0:, i].values
@@ -100,21 +109,24 @@ def Linear_reggression():
                 best_t = T
                 best_error = x
 
-        print("The value of y_pred for emotion " + e + " is:" + str(sum(y_pred)/len(y_pred)))
-        print("The value of y_test for emotion " + e + " is:" + str(sum(y_test)/len(y_test)))
+        print("Best t: " + str(best_t))
+        #print("The value of y_pred for emotion " + e + " is:" + str(sum(y_pred)/len(y_pred)))
+        print("The sum of y_pred for emotion " + e + " is:" + str(sum(y_pred)))
+        #print("The value of y_test for emotion " + e + " is:" + str(sum(y_test)/len(y_test)))
+        print("The sum of y_test for emotion " + e + " is:" + str(sum(y_test)))
+        #results.append(sum(y_pred)/len(y_pred))
+        results.append(sum(y_pred))
 
+    return results
 
-def prediction(tweets):
-    Preprocessing_data()
-    best_t = 1
-    best_mse = Linear_reggression(1)
-    for t in range(2,10):
-        x = Linear_reggression(t)
-        if(x < best_mse):
-            best_mse = x
-            best_t = t
-    print("Best t: " + str(best_t) + "  with MSE: ", str(best_mse))
-
-
-#Preprocessing_data()
-Linear_reggression()
+def prediction(set_of_tweets):
+    if Preprocessing_data(set_of_tweets) == None:
+        return  None
+    x =  Linear_reggression()
+    if len(set_of_tweets) > 1000:
+        x.append(1000)
+    elif len(set_of_tweets) < 500:
+        x.append(0)
+    else:
+        x.append(len(set_of_tweets))
+    return x

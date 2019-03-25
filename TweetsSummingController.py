@@ -238,7 +238,9 @@ class TweetsSummingController:
         if self.summed_tweets_counter == 0:
             return None
         else:
-            return [self.total_vector, self.tweetText1, self.author1, self.tweetText2, self.author2, self.summed_tweets_counter]
+            # Use linear regression to predict the results of the tweets
+            prediction_result = Prediction.prediction(tweets)
+            return [self.total_vector, self.tweetText1, self.author1, self.tweetText2, self.author2, self.summed_tweets_counter, prediction_result]
 
 
     def locateRepresentativeTweetsProcedure(self, tweet):

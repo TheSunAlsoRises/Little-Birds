@@ -63,6 +63,7 @@ class SummingThread(QThread):
 
     def run(self):
         # Call function to sum the relevant tweets
+        # Also, inside this function, use linear regression to predict the results of the tweets
         self.tweetsSummingObj = TweetsSummingController.TweetsSummingController(self.parameters)
         Graph.GraphUI.tweetsSum = self.tweetsSummingObj.tweetsSumming()
 
@@ -80,8 +81,29 @@ class SummingThread(QThread):
 
                 print(Graph.GraphUI.tweetsSum[0][i])
 
+            # Two reprsentative tweets
             print(Graph.GraphUI.tweetsSum[1])
             print(Graph.GraphUI.tweetsSum[2])
+
+        # Get thepresiction result
+        Graph.GraphUI.prediction = Graph.GraphUI.tweetsSum[6]
+        if Graph.GraphUI.prediction is not None:
+
+            # Noramlize the result as percents:
+            Graph.GraphUI.prediction_size = Graph.GraphUI.prediction[len(Graph.GraphUI.prediction)-1]
+            Graph.GraphUI.prediction = Graph.GraphUI.prediction[:-1]
+            maximal_value = max(Graph.GraphUI.prediction)
+            if maximal_value == 0:  # Never divide by zero!
+                maximal_value = 0.1
+
+            for i in range(8):
+                Graph.GraphUI.prediction[i] = (Graph.GraphUI.prediction[i] / maximal_value) * 100
+                # Raise it up a little, '0' value can make close values barely seen
+                if Graph.GraphUI.prediction[i] == 0:
+                    Graph.GraphUI.prediction[i] = 2.5
+
+                print(Graph.GraphUI.prediction[i])
+
 
         # Call function to sum the relevant scriptlines
         self.scriptlinesSummingObj = ScriptlinesSummingController.ScriptlinesSummingController(self.parameters)
@@ -102,6 +124,7 @@ class SummingThread(QThread):
 
                 print(Graph.GraphUI.scriptsSum[0][i])
 
+            # Two reprsentative scriptlines
             print(Graph.GraphUI.scriptsSum[1])
             print(Graph.GraphUI.scriptsSum[2])
 
