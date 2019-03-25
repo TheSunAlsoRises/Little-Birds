@@ -14,83 +14,99 @@ def tupleToList(t):
 
 def Preprocessing_data():
     #Create dictionary
-    query_string = "SELECT Word FROM word"
-    words = DBconnect.DBconnect.send_query(query_string)
-    dict = ["tweet_text"]
 
-    for word in words:
-        word = ''.join(word)
-        dict.append(word)
-    dict.append("emotion_value")
+    emotions = ["Anger", "Disgust", "Fear", "Sadness", "Surprise", "Joy", "Anticipation", "Trust"]
+    for e in emotions:
+        query_string = "SELECT Word FROM word WHERE " + e + ">0"
+        words = DBconnect.DBconnect.send_query(query_string)
+        dict = ["tweet_text"]
 
-    with open('table1.csv','w') as f:
-        csv_writer = csv.writer(f)
-        csv_writer.writerow(dict)
-
-    #Collect all CleanText of tweet
-    query_string = "SELECT CleanText,EmotionsVec FROM tweet limit 0,10000;"
-    result = DBconnect.DBconnect.send_query(query_string)
-    tweets = tupleToList(result)
-
-    for tweet in tweets:
-        text = tweet[0]
-        emotion_vector = tweet[1].split(" ")
-        tweet_array = [0]*len(dict)
-        tweet_array[0] = text
-
-        emotion_value=0
-        for i in range(8):
-            x = float(emotion_vector[i])
-            emotion_value += x * float(2**(7-i))
-        tweet_array[len(dict)-1]=emotion_value/255
-
-        words = text.split(" ")
         for word in words:
-            try:
-                index_of_word =dict.index (word)
-                tweet_array[index_of_word]+=1
-            except:
-                pass
+            word = ''.join(word)
+            dict.append(word)
+        dict.append("emotion_value")
 
-        with open('table1.csv', 'a') as f:
+        with open(e+'.csv','w') as f:
             csv_writer = csv.writer(f)
-            csv_writer.writerow(tweet_array)
+            csv_writer.writerow(dict)
+
+        #Collect all CleanText of tweet
+        query_string = "SELECT CleanText,EmotionsVec FROM tweet limit 0,5000;"
+        result = DBconnect.DBconnect.send_query(query_string)
+        tweets = tupleToList(result)
+
+        for tweet in tweets:
+            text = tweet[0]
+            emotion_vector = tweet[1].split(" ")
+            tweet_array = [0]*len(dict)
+            tweet_array[0] = text
+
+            emotion_value= emotion_vector[emotions.index(e)]
+            tweet_array[len(dict)-1]=emotion_value
+
+            words = text.split(" ")
+            for word in words:
+                try:
+                    index_of_word =dict.index (word)
+                    tweet_array[index_of_word]+=1
+                except:
+                    pass
+
+            with open(e+'.csv', 'a') as f:
+                csv_writer = csv.writer(f)
+                csv_writer.writerow(tweet_array)
 
 
-def Linear_reggression(T):
-    dataset = pd.read_csv('table1.csv')
+def Linear_reggression():
+    emotions = ["Anger", "Disgust", "Fear", "Sadness", "Surprise", "Joy", "Anticipation", "Trust"]
+    for e in emotions:
+        print("\nEmotion :", e)
+        dataset = pd.read_csv(e+'.csv')
+        datasetsize = dataset.shape
 
-    names = []
-    for i in range(1, 6149):  # all col without first and last
-        r = dataset.iloc[0:, i].values
-        name = dataset.columns[i]
-        if sum(r)<T:
-            names.append(name)
-    # dropping passed columns
-    dataset.drop(names, axis=1, inplace=True)
+        for T in range(1,10):
+            names = []
+            for i in range(1, datasetsize[1]-1):  # all col without first and last
+                r = dataset.iloc[0:, i].values
+                name = dataset.columns[i]
+                if sum(r)<T:
+                    names.append(name)
+            # dropping passed columns
+            dataset.drop(names, axis=1, inplace=True)
 
-    datasetsize = dataset.shape
+            datasetsize = dataset.shape
 
-    # Split to input and lable
-    x = dataset.iloc[:, 1:-1].values
-    y = dataset.iloc[:, datasetsize[1]-1].values
+            # Split to input and lable
+            x = dataset.iloc[:, 1:-1].values
+            y = dataset.iloc[:, datasetsize[1]-1].values
 
-    # Split the dataset into the Training set and Test set
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
+            # Split the dataset into the Training set and Test set
+            x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
 
-    # Fitting Multiple Linear Regression to the Training set
-    regressor = LinearRegression()
-    regressor.fit(x_train, y_train)
+            # Fitting Multiple Linear Regression to the Training set
+            regressor = LinearRegression()
+            regressor.fit(x_train, y_train)
 
-    # Predicting the Test set result
-    y_pred = regressor.predict(x_test)
-    print('Coefficients: \n', regressor.coef_)
-    print("T : ",T)
-    # The mean squared error
-    print("Mean squared error: %.4f"
-          % mean_squared_error(y_test, y_pred))
+            # Predicting the Test set result
+            y_pred = regressor.predict(x_test)
+            #print('Coefficients: \n', regressor.coef_)
+            print("T : ",T)
+            # The mean squared error
+            print("Mean squared error: %.4f"
+                  % mean_squared_error(y_test, y_pred))
 
 
-#Preprocessing_data()
-for t in range (2,5):
-    Linear_reggression(t)
+def prediction(tweets):
+    Preprocessing_data()
+    best_t = 1
+    best_mse = Linear_reggression(1)
+    for t in range(2,10):
+        x = Linear_reggression(t)
+        if(x < best_mse):
+            best_mse = x
+            best_t = t
+    print("Best t: " + str(best_t) + "  with MSE: ", str(best_mse))
+
+
+Preprocessing_data()
+Linear_reggression()

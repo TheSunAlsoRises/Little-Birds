@@ -1,4 +1,5 @@
 import DBconnect
+import Prediction
 
 #CONVERT TUPLE TO LIST FUNCTION
 def tupleToList(t):
@@ -27,6 +28,8 @@ class TweetsSummingController:
         self.author2 = ""
 
     def tweetsSumming(self):
+        # The relevant tweets for each query
+        tweets = []
 
         if self.category == "character":
 
@@ -205,6 +208,9 @@ class TweetsSummingController:
 
             else:
                 print("not in DB!")
+
+
+        Prediction.prediction(tweets)
 
         query_string = "SELECT OriginalText, UserName FROM tweet WHERE TweetID like "\
                        + q + str(self.representive_tweet_ID1) + q
