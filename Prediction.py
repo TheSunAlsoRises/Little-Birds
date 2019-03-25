@@ -31,7 +31,7 @@ def Preprocessing_data():
             csv_writer.writerow(dict)
 
         #Collect all CleanText of tweet
-        query_string = "SELECT CleanText,EmotionsVec FROM tweet limit 0,5000;"
+        query_string = "SELECT CleanText,EmotionsVec FROM tweet limit 0,1000;"
         result = DBconnect.DBconnect.send_query(query_string)
         tweets = tupleToList(result)
 
@@ -64,7 +64,9 @@ def Linear_reggression():
         dataset = pd.read_csv(e+'.csv')
         datasetsize = dataset.shape
 
-        for T in range(1,10):
+        best_t = 1
+        best_error = 11111111111111111111111111111
+        for T in range(2,7):
             names = []
             for i in range(1, datasetsize[1]-1):  # all col without first and last
                 r = dataset.iloc[0:, i].values
@@ -92,8 +94,14 @@ def Linear_reggression():
             #print('Coefficients: \n', regressor.coef_)
             print("T : ",T)
             # The mean squared error
-            print("Mean squared error: %.4f"
-                  % mean_squared_error(y_test, y_pred))
+            x = mean_squared_error(y_test, y_pred)
+            print("Mean squared error: %.4f" %x)
+            if(x<best_error):
+                best_t = T
+                best_error = x
+
+        print("The value of y_pred for emotion " + e + " is:" + str(sum(y_pred)/len(y_pred)))
+        print("The value of y_test for emotion " + e + " is:" + str(sum(y_test)/len(y_test)))
 
 
 def prediction(tweets):
@@ -108,5 +116,5 @@ def prediction(tweets):
     print("Best t: " + str(best_t) + "  with MSE: ", str(best_mse))
 
 
-Preprocessing_data()
+#Preprocessing_data()
 Linear_reggression()
