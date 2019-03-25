@@ -290,7 +290,7 @@ class GraphUI (QtGui.QDialog):
         ax.fill(angles, values, 'g', alpha=0.1)
 
         # Add legend
-        plt.legend(loc='upper right', bbox_to_anchor=(0.15, 0.05))
+        plt.legend(loc='upper right', bbox_to_anchor=(0.2, 0.05))
 
         # create an axis
         #ax = self.figure.add_subplot(111)
