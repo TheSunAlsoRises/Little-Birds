@@ -95,6 +95,35 @@ class Ui_Form(object):
         self.label.setText(_fromUtf8(""))
         self.label.setPixmap(QtGui.QPixmap(_fromUtf8("../pictures/winter1.jpeg")))
         self.label.setObjectName(_fromUtf8("label"))
+        self.help_button = QtGui.QPushButton(Form)
+        self.help_button.setGeometry(QtCore.QRect(800, 50, 41, 41))
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        font.setBold(True)
+        font.setWeight(75)
+        self.help_button.setFont(font)
+        self.help_button.setStyleSheet(_fromUtf8("QPushButton\n"
+"{ \n"
+"background-color: 000000;\n"
+"  color: black;\n"
+"  border: 4px solid #00aced;\n"
+"border-radius: 15px;\n"
+"}\n"
+"\n"
+"QPushButton:hover\n"
+"{\n"
+"  background-color: #111111;\n"
+"  color: white;\n"
+"}\n"
+"\n"
+"QPushButton:pressed\n"
+"{\n"
+"  background-color: #111111;\n"
+"  color: white;\n"
+"  border: 2.666px solid #00aced;\n"
+"}\n"
+""))
+        self.help_button.setObjectName(_fromUtf8("help_button"))
         self.label.raise_()
         self.label_3.raise_()
         self.comboBox.raise_()
@@ -102,6 +131,7 @@ class Ui_Form(object):
         self.next_button.raise_()
         self.headline.raise_()
         self.label_2.raise_()
+        self.help_button.raise_()
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -110,4 +140,5 @@ class Ui_Form(object):
         Form.setWindowTitle(_translate("Form", "Form", None))
         self.headline.setText(_translate("Form", "Where would you like to be?", None))
         self.label_2.setText(_translate("Form", "Location:", None))
+        self.help_button.setText(_translate("Form", "?", None))
 

@@ -101,6 +101,35 @@ class Ui_Form(object):
         self.back_button.setIcon(icon1)
         self.back_button.setIconSize(QtCore.QSize(80, 80))
         self.back_button.setObjectName(_fromUtf8("back_button"))
+        self.help_button = QtGui.QPushButton(Form)
+        self.help_button.setGeometry(QtCore.QRect(800, 50, 41, 41))
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        font.setBold(True)
+        font.setWeight(75)
+        self.help_button.setFont(font)
+        self.help_button.setStyleSheet(_fromUtf8("QPushButton\n"
+"{ \n"
+"background-color: 000000;\n"
+"  color: black;\n"
+"  border: 4px solid #00aced;\n"
+"border-radius: 15px;\n"
+"}\n"
+"\n"
+"QPushButton:hover\n"
+"{\n"
+"  background-color: #111111;\n"
+"  color: white;\n"
+"}\n"
+"\n"
+"QPushButton:pressed\n"
+"{\n"
+"  background-color: #111111;\n"
+"  color: white;\n"
+"  border: 2.666px solid #00aced;\n"
+"}\n"
+""))
+        self.help_button.setObjectName(_fromUtf8("help_button"))
         self.label.raise_()
         self.label_2.raise_()
         self.headline.raise_()
@@ -109,6 +138,7 @@ class Ui_Form(object):
         self.checkBox_3.raise_()
         self.next_button.raise_()
         self.back_button.raise_()
+        self.help_button.raise_()
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -119,4 +149,5 @@ class Ui_Form(object):
         self.checkBox_2.setText(_translate("Form", " House", None))
         self.checkBox_3.setText(_translate("Form", " Location", None))
         self.headline.setText(_translate("Form", "Select a search category", None))
+        self.help_button.setText(_translate("Form", "?", None))
 

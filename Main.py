@@ -1,16 +1,22 @@
-from nltk.stem import WordNetLemmatizer
-import DBconnect
-import AnalysisController
-import Tweet
-import Episode
-import ScriptFilesController
-import TweetsSummingController
-import ManagerUIsController, ManagerMenuController
-from PyQt4 import QtCore, QtGui
+#from nltk.stem import WordNetLemmatizer
+#import DBconnect
+#import AnalysisController
+#import Tweet
+#import Episode
+#import ScriptFilesController
+#import TweetsSummingController
+#import ManagerUIsController, ManagerMenuController
+#from PyQt4 import QtCore, QtGui
 import sys
+import os
 
 if __name__ == "__main__":
-    pass
+    filename = 'MASol.pdf'
+    os.startfile(filename)
+#    subprocess.Popen(['C:\\Users\אליה\Desktop\MASol'], shell=True)
+
+
+
     #app = QtGui.QApplication(sys.argv)
 
     #login = ManagerUIsController.LoginWin(None)

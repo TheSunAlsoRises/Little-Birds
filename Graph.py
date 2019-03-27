@@ -18,7 +18,7 @@ class GraphUI (QtGui.QDialog):
     tweetsSum = None
     scriptsSum = None
     prediction = None
-    prediction_size = None
+    prediction_size = 0
 
     def __init__(self, parent=None):
         super(GraphUI, self).__init__(parent)
@@ -94,10 +94,14 @@ class GraphUI (QtGui.QDialog):
                                  "font-size: 35px;")
 
         # Set secondary headline
-        self.second_label = QtGui.QLabel("Produced from " + str(GraphUI.tweetsSum[5]) + " tweets, "
-                                         + str(GraphUI.scriptsSum[3]) + " script lines, " +
-                                         str(round(0.8*GraphUI.prediction_size)) + " for training set and " +
-                                         str(round(0.2*GraphUI.prediction_size)) + " for testing set")
+        self.second_label = QtGui.QLabel("Produced from " + str(GraphUI.tweetsSum[5]) + " tweets and "
+                                         + str(GraphUI.scriptsSum[3]) + " script lines. " +
+                                         str(round(0.8*GraphUI.prediction_size)) + " tweets used as a training-set and " +
+                                         str(round(0.2*GraphUI.prediction_size)) + " tweets used as a testing-set.")
+        if GraphUI.prediction_size == 0:
+            self.second_label = QtGui.QLabel("Produced from " + str(GraphUI.tweetsSum[5]) + " tweets and "
+                                         + str(GraphUI.scriptsSum[3]) + " script lines. No prediction was done, "
+                                                                        "due to lack of relevant data.")
         self.second_label.setAlignment(QtCore.Qt.AlignCenter)
         self.second_label.setStyleSheet("background-color: rgb(255, 255, 255);"
                                         "color: rgb(0, 0, 0);"

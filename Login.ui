@@ -214,6 +214,49 @@
     </size>
    </property>
   </widget>
+  <widget class="QPushButton" name="help_button">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>50</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton
+{ 
+background-color: 000000;
+  color: black;
+  border: 4px solid #00aced;
+border-radius: 15px;
+}
+
+QPushButton:hover
+{
+  background-color: #111111;
+  color: white;
+}
+
+QPushButton:pressed
+{
+  background-color: #111111;
+  color: white;
+  border: 2.666px solid #00aced;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>?</string>
+   </property>
+  </widget>
   <zorder>label</zorder>
   <zorder>label_2</zorder>
   <zorder>headline</zorder>
@@ -223,6 +266,7 @@
   <zorder>password_label</zorder>
   <zorder>back_button</zorder>
   <zorder>next_button</zorder>
+  <zorder>help_button</zorder>
  </widget>
  <resources/>
  <connections/>

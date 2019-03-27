@@ -25,7 +25,7 @@ except AttributeError:
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName(_fromUtf8("Form"))
-        Form.resize(891, 541)
+        Form.resize(889, 541)
         Form.setStyleSheet(_fromUtf8(""))
         self.label = QtGui.QLabel(Form)
         self.label.setGeometry(QtCore.QRect(-120, 80, 531, 81))
@@ -140,12 +140,42 @@ class Ui_Form(object):
 "}\n"
 ""))
         self.manager_area_button.setObjectName(_fromUtf8("manager_area_button"))
+        self.help_button = QtGui.QPushButton(Form)
+        self.help_button.setGeometry(QtCore.QRect(800, 50, 41, 41))
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        font.setBold(True)
+        font.setWeight(75)
+        self.help_button.setFont(font)
+        self.help_button.setStyleSheet(_fromUtf8("QPushButton\n"
+"{ \n"
+"background-color: 000000;\n"
+"  color: black;\n"
+"  border: 4px solid #00aced;\n"
+"border-radius: 15px;\n"
+"}\n"
+"\n"
+"QPushButton:hover\n"
+"{\n"
+"  background-color: #111111;\n"
+"  color: white;\n"
+"}\n"
+"\n"
+"QPushButton:pressed\n"
+"{\n"
+"  background-color: #111111;\n"
+"  color: white;\n"
+"  border: 2.666px solid #00aced;\n"
+"}\n"
+""))
+        self.help_button.setObjectName(_fromUtf8("help_button"))
         self.label_2.raise_()
         self.label.raise_()
         self.label_3.raise_()
         self.label_4.raise_()
         self.start_button.raise_()
         self.manager_area_button.raise_()
+        self.help_button.raise_()
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -157,4 +187,5 @@ class Ui_Form(object):
         self.label_4.setText(_translate("Form", "About #Game_of_Thrones", None))
         self.start_button.setText(_translate("Form", "Start", None))
         self.manager_area_button.setText(_translate("Form", "Manager area", None))
+        self.help_button.setText(_translate("Form", "?", None))
 

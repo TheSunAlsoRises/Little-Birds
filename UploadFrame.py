@@ -28,7 +28,7 @@ class Ui_Form(object):
         Form.resize(891, 541)
         Form.setStyleSheet(_fromUtf8("background-color: rgb(255, 255, 255);"))
         self.label = QtGui.QLabel(Form)
-        self.label.setGeometry(QtCore.QRect(240, 430, 411, 111))
+        self.label.setGeometry(QtCore.QRect(240, 430, 411, 121))
         self.label.setText(_fromUtf8(""))
         self.label.setPixmap(QtGui.QPixmap(_fromUtf8("../pictures/winter2 down.jpeg")))
         self.label.setObjectName(_fromUtf8("label"))
@@ -44,17 +44,17 @@ class Ui_Form(object):
         self.headline.setAlignment(QtCore.Qt.AlignCenter)
         self.headline.setObjectName(_fromUtf8("headline"))
         self.label_4 = QtGui.QLabel(Form)
-        self.label_4.setGeometry(QtCore.QRect(240, 0, 411, 221))
+        self.label_4.setGeometry(QtCore.QRect(240, -10, 411, 231))
         self.label_4.setText(_fromUtf8(""))
         self.label_4.setPixmap(QtGui.QPixmap(_fromUtf8("../pictures/winter2 up.jpg")))
         self.label_4.setObjectName(_fromUtf8("label_4"))
         self.label_5 = QtGui.QLabel(Form)
-        self.label_5.setGeometry(QtCore.QRect(650, 0, 241, 541))
+        self.label_5.setGeometry(QtCore.QRect(650, -10, 251, 551))
         self.label_5.setText(_fromUtf8(""))
         self.label_5.setPixmap(QtGui.QPixmap(_fromUtf8("../pictures/winter2 right.jpeg")))
         self.label_5.setObjectName(_fromUtf8("label_5"))
         self.label_6 = QtGui.QLabel(Form)
-        self.label_6.setGeometry(QtCore.QRect(0, 0, 241, 541))
+        self.label_6.setGeometry(QtCore.QRect(-10, -10, 251, 561))
         self.label_6.setText(_fromUtf8(""))
         self.label_6.setPixmap(QtGui.QPixmap(_fromUtf8("../pictures/winter2 left.jpeg")))
         self.label_6.setObjectName(_fromUtf8("label_6"))
@@ -154,6 +154,35 @@ class Ui_Form(object):
         self.upload_button.setIcon(icon1)
         self.upload_button.setIconSize(QtCore.QSize(80, 80))
         self.upload_button.setObjectName(_fromUtf8("upload_button"))
+        self.help_button = QtGui.QPushButton(Form)
+        self.help_button.setGeometry(QtCore.QRect(800, 50, 41, 41))
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        font.setBold(True)
+        font.setWeight(75)
+        self.help_button.setFont(font)
+        self.help_button.setStyleSheet(_fromUtf8("QPushButton\n"
+"{ \n"
+"background-color: 000000;\n"
+"  color: black;\n"
+"  border: 4px solid #00aced;\n"
+"border-radius: 15px;\n"
+"}\n"
+"\n"
+"QPushButton:hover\n"
+"{\n"
+"  background-color: #111111;\n"
+"  color: white;\n"
+"}\n"
+"\n"
+"QPushButton:pressed\n"
+"{\n"
+"  background-color: #111111;\n"
+"  color: white;\n"
+"  border: 2.666px solid #00aced;\n"
+"}\n"
+""))
+        self.help_button.setObjectName(_fromUtf8("help_button"))
         self.label_6.raise_()
         self.label_3.raise_()
         self.label.raise_()
@@ -171,6 +200,7 @@ class Ui_Form(object):
         self.line_4.raise_()
         self.back_button.raise_()
         self.upload_button.raise_()
+        self.help_button.raise_()
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -179,4 +209,5 @@ class Ui_Form(object):
         Form.setWindowTitle(_translate("Form", "Form", None))
         self.headline.setText(_translate("Form", "Drop the files below", None))
         self.uploading_message.setText(_translate("Form", " Drop the files below", None))
+        self.help_button.setText(_translate("Form", "?", None))
 

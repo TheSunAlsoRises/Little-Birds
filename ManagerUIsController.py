@@ -247,6 +247,7 @@ class MainWindow(QMainWindow):
 
         # Set buttons destinations:
         self.Window.ui.start_button.clicked.connect(self.startEpisodeUI)
+        self.Window.ui.help_button.clicked.connect(self.open_help_page)
         login_status = LoginController.LoginController.isLoggedIn(self.username)
         if login_status == -1:
             self.Window.ui.manager_area_button.clicked.connect(self.startLoginUI)
@@ -262,6 +263,7 @@ class MainWindow(QMainWindow):
         self.Window = EpisodeUI(self)
         self.setWindowTitle("Little Birds")
         self.setCentralWidget(self.Window)
+        self.Window.ui.help_button.clicked.connect(self.open_help_page)
         self.Window.ui.label.setStyleSheet("background-image: url(./pictures/winter1.jpeg);")
         self.Window.ui.next_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/tran_right.png')))
         self.Window.ui.back_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/icons8-reply-arrow-100.png')))
@@ -287,6 +289,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Little Birds")
         self.setCentralWidget(self.Window)
         self.Window.ui.label.setStyleSheet("background-image: url(./pictures/winter1.jpeg);")
+        self.Window.ui.help_button.clicked.connect(self.open_help_page)
         self.Window.ui.next_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/tran_right.png')))
         self.Window.ui.back_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/icons8-reply-arrow-100.png')))
         self.Window.ui.next_button.setDisabled(True)
@@ -339,6 +342,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Little Birds")
         self.setCentralWidget(self.Window)
         self.Window.ui.label.setStyleSheet("background-image: url(./pictures/winter1.jpeg);")
+        self.Window.ui.help_button.clicked.connect(self.open_help_page)
         self.Window.ui.next_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/tran_right.png')))
         self.Window.ui.back_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/icons8-reply-arrow-100.png')))
         self.Window.ui.next_button.clicked.connect(lambda:self.saveCharacterSelection("next"))
@@ -377,6 +381,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Little Birds")
         self.setCentralWidget(self.Window)
         self.Window.ui.label.setStyleSheet("background-image: url(./pictures/winter1.jpeg);")
+        self.Window.ui.help_button.clicked.connect(self.open_help_page)
         self.Window.ui.next_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/tran_right.png')))
         self.Window.ui.back_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/icons8-reply-arrow-100.png')))
         self.Window.ui.next_button.clicked.connect(lambda:self.saveLocationSelection("next"))
@@ -415,6 +420,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Little Birds")
         self.setCentralWidget(self.Window)
         self.Window.ui.label.setStyleSheet("background-image: url(./pictures/winter1.jpeg);")
+        self.Window.ui.help_button.clicked.connect(self.open_help_page)
         self.Window.ui.next_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/tran_right.png')))
         self.Window.ui.back_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/icons8-reply-arrow-100.png')))
         self.Window.ui.next_button.setDisabled(True)
@@ -506,6 +512,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Login")
         self.setCentralWidget(self.Window)
         self.Window.ui.label.setStyleSheet("background-image: url(./pictures/winter2.jpeg);")
+        self.Window.ui.help_button.clicked.connect(self.open_help_page)
         self.Window.ui.next_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/tran_right.png')))
         self.Window.ui.back_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/icons8-reply-arrow-100.png')))
         self.Window.ui.next_button.clicked.connect(self.login)
@@ -535,6 +542,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Manager Menu")
         self.setCentralWidget(self.Window)
         self.Window.ui.label.setStyleSheet("background-image: url(./pictures/winter2.jpeg);")
+        self.Window.ui.help_button.clicked.connect(self.open_help_page)
         self.Window.ui.back_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/icons8-reply-arrow-100.png')))
         self.Window.ui.back_button.clicked.connect(self.startMainPageUI)
         self.Window.ui.logout_button.clicked.connect(self.logout)
@@ -567,6 +575,7 @@ class MainWindow(QMainWindow):
         self.Window.ui.label_6.setStyleSheet("background-image: url(./pictures/winter2 left.jpeg);")
         self.Window.ui.label_5.setStyleSheet("background-image: url(./pictures/winter2 right.jpeg);")
         self.Window.ui.label_4.setStyleSheet("background-image: url(./pictures/winter2 up.jpg);")
+        self.Window.ui.help_button.clicked.connect(self.open_help_page)
         self.Window.ui.upload_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/icons8-upload-100.png')))
         self.Window.ui.back_button.setIcon(QtGui.QIcon(QtGui.QPixmap('./buttons/icons8-reply-arrow-100.png')))
 
@@ -694,6 +703,9 @@ class MainWindow(QMainWindow):
         msg.setStandardButtons(QMessageBox.Ok)
         retval = msg.exec_()
         return msg
+
+    def open_help_page(self):
+        os.startfile('help.pdf')
 
 
 def showdialog(title, text, status):
